@@ -1,2 +1,4 @@
 # smart-pet-feeder
 The Smart Pet Feeder is an Arduino-based project designed to automatically feed pets in a controlled and intelligent way. The system combines sensors, manual controls, and Bluetooth connectivity to ensure pets are fed accurately and safely, even when the owner is not at home.
+A servo motor controls the lid of the feeder, opening and closing to dispense food. A weight sensor monitors the amount of food in the bowl, and the lid automatically closes once 15 grams are detected. The LCD display alternates between Standby and Feeding modes depending on the current state of the lid.
+LEDs and a buzzer provide visual and audio feedback, while a temperature and humidity sensor monitors environmental conditions. The Smart Pet Feeder is designed to be reliable, easy to use, and expandable with future features such as scheduling, camera integration, or cloud monitoring.
