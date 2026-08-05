@@ -23,6 +23,7 @@ export interface FeederSettings {
 
 export interface Pet {
   _id: string; // Convex document ID
+  id?: string; // Compatibility alias used by local UI models
   ownerId?: string;
   name: string;
   species: string; // e.g. "Cat" | "Dog"

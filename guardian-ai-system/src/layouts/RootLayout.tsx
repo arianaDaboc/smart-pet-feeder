@@ -38,7 +38,7 @@ export const RootLayout: React.FC = () => {
         email: user.primaryEmailAddress?.emailAddress || '',
         fullName: user.fullName || '',
         image: user.imageUrl || '',
-      }).catch((err) => {
+      }).catch(() => {
         // Silently ignore cloud sync errors
       });
     }

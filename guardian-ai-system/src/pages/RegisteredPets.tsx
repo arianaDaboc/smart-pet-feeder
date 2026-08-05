@@ -56,6 +56,7 @@ export const RegisteredPets: React.FC = () => {
   // Upload file helper with timeout
   const uploadFileToConvex = async (file: File): Promise<string> => {
     const uploadUrl = await generateUploadUrl();
+    if (!uploadUrl) throw new Error('Could not create a Convex upload URL.');
     const result = await fetch(uploadUrl, {
       method: 'POST',
       headers: { 'Content-Type': file.type },
