@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.next/
+.env
+.env.*
+!.env.example
+*.log
+local-ai-server/data/pets.json
+local-ai-server/data/pets.json.tmp
+
