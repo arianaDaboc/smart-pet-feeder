@@ -20,7 +20,7 @@ export const HealthInsights: React.FC = () => {
     localPets = [];
   }
   const pets = remotePets.length > 0 ? remotePets : localPets;
-  
+
   const startOfToday = new Date().setHours(0, 0, 0, 0);
   const feedingsToday = feedHistory.filter(f => f.timestamp >= startOfToday && f.completed);
   const totalToday = feedingsToday.reduce((sum, f) => sum + f.amountDispensed, 0);
@@ -297,7 +297,7 @@ export const HealthInsights: React.FC = () => {
 
   return (
     <section className="p-4 md:p-8 space-y-6 max-w-[1440px] mx-auto w-full min-h-screen">
-      {/* Page Header */}
+
       <div className="flex justify-between items-end">
         <div>
           <h3 className="font-bold text-3xl text-on-surface tracking-tight">Health &amp; Insights</h3>
@@ -305,7 +305,6 @@ export const HealthInsights: React.FC = () => {
         </div>
       </div>
 
-      {/* High Level Metric Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0] hover:-translate-y-0.5 transition-transform duration-200">
           <div className="flex items-center justify-between mb-4">
@@ -366,9 +365,8 @@ export const HealthInsights: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-12 gap-6">
-        {/* Food Consumption Chart */}
+
         <div className="col-span-12 lg:col-span-8 bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0] min-h-[350px] flex flex-col justify-between">
           <div>
             <h4 className="font-bold text-lg text-on-surface mb-1">Consumption Telemetry</h4>
@@ -387,7 +385,7 @@ export const HealthInsights: React.FC = () => {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                   <XAxis dataKey="date" stroke="#94A3B8" fontSize={9} tickLine={false} />
                   <YAxis stroke="#94A3B8" fontSize={9} tickLine={false} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#FFF', border: '1px solid #E2E8F0', borderRadius: '8px' }}
                     labelStyle={{ fontWeight: 'bold', color: '#0F172A', fontSize: '11px' }}
                     itemStyle={{ color: '#0F172A', fontSize: '11px' }}
@@ -407,7 +405,6 @@ export const HealthInsights: React.FC = () => {
           </div>
         </div>
 
-        {/* Successful Feedings Today List */}
         <div className="col-span-12 lg:col-span-4 bg-white rounded-xl p-6 shadow-sm border border-[#E2E8F0] flex flex-col justify-between min-h-[350px]">
           <div>
             <h4 className="font-bold text-lg text-on-surface mb-1">Successful Feedings Today</h4>
@@ -439,7 +436,6 @@ export const HealthInsights: React.FC = () => {
         </div>
       </div>
 
-      {/* Health Recommendations */}
       <div className="mt-12">
         <h4 className="font-bold text-xl text-on-surface mb-6">AI Health Recommendations</h4>
         <div className="rounded-3xl border border-outline-variant/30 bg-gradient-to-br from-white to-primary/[0.03] p-6 md:p-8 shadow-sm">

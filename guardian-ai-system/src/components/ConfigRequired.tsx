@@ -8,16 +8,16 @@ export const ConfigRequired: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-6 font-sans">
       <div className="w-full max-w-2xl bg-white border border-[#bbcabf]/30 rounded-[24px] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.05)] p-8 md:p-12 relative overflow-hidden">
-        {/* Subtle Decorative Gradient */}
+
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#006c49]/5 rounded-full blur-3xl"></div>
-        
+
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-2xl bg-[#006c49]/10 flex items-center justify-center text-[#006c49] mb-6">
             <span className="material-symbols-outlined text-[36px]" style={{ fontVariationSettings: "'FILL' 1" }}>
               settings_input_component
             </span>
           </div>
-          
+
           <h1 className="text-3xl font-bold text-[#0b1c30] tracking-tight mb-3">
             Guardian AI Setup Required
           </h1>
@@ -52,21 +52,21 @@ export const ConfigRequired: React.FC = () => {
                 Used to store pet profiles, device metrics, and configuration logs. Setup a Convex project using the CLI and supply the URL.
               </p>
               <div className="bg-white border border-[#bbcabf]/30 p-2.5 rounded-lg font-mono text-[11px] text-[#0b1c30]">
-                VITE_CONVEX_URL=https://...convex.cloud
+                VITE_CONVEX_URL=https:
               </div>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="px-8 py-3.5 bg-[#006c49] text-white font-semibold text-sm rounded-xl shadow-lg shadow-[#006c49]/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined text-[18px]">refresh</span>
               Check Configuration Again
             </button>
           </div>
-          
+
           <p className="text-[11px] text-[#3c4a42]/60 mt-8">
             Create an <b>.env.local</b> file in the root of your project folder to local-load these variables.
           </p>

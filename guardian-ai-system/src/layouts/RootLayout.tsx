@@ -11,7 +11,7 @@ export const RootLayout: React.FC = () => {
   const location = useLocation();
   const { user } = useUser();
   const syncUser = useMutation(api.users.sync);
-  
+
   const ownerId = user?.id || '';
   let convexSettings = undefined;
   try {
@@ -23,14 +23,14 @@ export const RootLayout: React.FC = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Synchronize Convex device settings to Zustand store
+
   useEffect(() => {
     if (convexSettings) {
       syncFromConvex(convexSettings);
     }
   }, [convexSettings, syncFromConvex]);
 
-  // Automatically sync authenticated user profile details to Convex
+
   useEffect(() => {
     if (user && syncUser) {
       syncUser({
@@ -39,12 +39,12 @@ export const RootLayout: React.FC = () => {
         fullName: user.fullName || '',
         image: user.imageUrl || '',
       }).catch(() => {
-        // Silently ignore cloud sync errors
+
       });
     }
   }, [user, syncUser]);
 
-  // Resolve header title based on current path
+
   const getHeaderTitle = (pathname: string): string => {
     switch (pathname) {
       case '/':
@@ -70,22 +70,22 @@ export const RootLayout: React.FC = () => {
 
   const title = getHeaderTitle(location.pathname);
 
-  // Close sidebar on navigation change (mobile)
+
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-surface flex">
-      {/* Sidebar Navigation */}
+
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Content Area */}
+
       <div className="flex-1 flex flex-col min-h-screen lg:pl-[260px] w-full">
-        {/* Sticky Topbar Header */}
+
         <Header title={title} onMenuClick={() => setSidebarOpen(true)} />
 
-        {/* Dynamic Page Router Canvas */}
+
         <main className="flex-1 w-full overflow-x-hidden">
           <Outlet />
         </main>

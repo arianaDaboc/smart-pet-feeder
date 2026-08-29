@@ -12,14 +12,12 @@ export const Dashboard: React.FC = () => {
 
   const { isDispensing, dispenseFood, syncFromConvex } = useFeederStore();
 
-  // Fetch real data from Convex safely
   const convexSettings = useSafeQuery(api.deviceSettings.get, { ownerId }, null);
   const feedHistory = useSafeQuery(api.feedHistory.list, { ownerId }, []);
   const aiDetections = useSafeQuery(api.aiRecognition.list, { ownerId }, []);
 
   const updateSettingsMutation = useSafeMutation(api.deviceSettings.update);
 
-  // Keep store in sync with Convex
   useEffect(() => {
     if (convexSettings) syncFromConvex(convexSettings);
   }, [convexSettings, syncFromConvex]);
@@ -27,7 +25,6 @@ export const Dashboard: React.FC = () => {
   const [isRefilling, setIsRefilling] = useState(false);
   const [refillWeight, setRefillWeight] = useState(2000);
 
-  // Settings & Telemetry from Convex
   const isOnline = !!convexSettings?.online && (Date.now() - (convexSettings?.lastSeen ?? 0) < 35000);
   const feederStatus = isOnline ? (convexSettings?.deviceStatus || 'STANDBY') : 'OFFLINE';
 
@@ -35,28 +32,27 @@ export const Dashboard: React.FC = () => {
   const initialFood = convexSettings?.initialFoodAmount ?? 2000;
   const estimatedFoodRemaining = convexSettings?.estimatedFoodRemaining ?? 2000;
   const remainingPercentage = Math.round((estimatedFoodRemaining / initialFood) * 100);
-  
+
   const cooldownMinutes = convexSettings?.cooldownMinutes ?? 30;
 
-  const currentTemp = isOnline && convexSettings?.currentTemperature !== undefined 
-    ? `${convexSettings.currentTemperature.toFixed(1)}°C` 
+  const currentTemp = isOnline && convexSettings?.currentTemperature !== undefined
+    ? `${convexSettings.currentTemperature.toFixed(1)}°C`
     : "N/A";
-  const currentHum = isOnline && convexSettings?.currentHumidity !== undefined 
-    ? `${convexSettings.currentHumidity.toFixed(0)}%` 
+  const currentHum = isOnline && convexSettings?.currentHumidity !== undefined
+    ? `${convexSettings.currentHumidity.toFixed(0)}%`
     : "N/A";
-  const currentWeight = isOnline && convexSettings?.currentWeight !== undefined 
-    ? `${convexSettings.currentWeight.toFixed(1)}g` 
+  const currentWeight = isOnline && convexSettings?.currentWeight !== undefined
+    ? `${convexSettings.currentWeight.toFixed(1)}g`
     : "N/A";
   const cameraStreamUrl = convexSettings?.cameraStreamUrl || localStorage.getItem('guardian_custom_camera_url') || '';
-    
-  const lastSeenStr = convexSettings?.lastSeen 
+
+  const lastSeenStr = convexSettings?.lastSeen
     ? new Date(convexSettings.lastSeen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     : 'Never';
 
-  // Last manual/automatic feed
   const successfulFeeds = feedHistory.filter(f => f.completed);
   const lastFeedEvent = successfulFeeds[0];
-  const lastFeedTimeStr = lastFeedEvent 
+  const lastFeedTimeStr = lastFeedEvent
     ? new Date(lastFeedEvent.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : 'None';
 
@@ -86,18 +82,16 @@ export const Dashboard: React.FC = () => {
     };
   }, []);
 
-  // Last AI Detected Companion: prefer the newest cloud or local-camera result.
   const cloudDetection = aiDetections[0] as any;
   const lastDetection = localDetection && (!cloudDetection || localDetection.timestamp > cloudDetection.timestamp)
     ? localDetection
     : cloudDetection;
   const lastDetectedPetName = lastDetection?.recognizedPetName || (lastDetection?.authorized ? "Authorized Pet" : lastDetection ? "Unknown Animal" : "None");
   const lastDetectedPetSpecies = lastDetection?.speciesDetected || '';
-  const lastDetectionTimeStr = lastDetection 
+  const lastDetectionTimeStr = lastDetection
     ? new Date(lastDetection.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     : 'No activity';
 
-  // Dynamic Cooldown remaining (seconds)
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const latestFeedTimestamp = feedHistory[0]?.timestamp;
 
@@ -123,7 +117,6 @@ export const Dashboard: React.FC = () => {
 
   const [dispenseStartWeight, setDispenseStartWeight] = useState(0);
 
-  // Monitor isDispensing to capture start weight
   useEffect(() => {
     if (isDispensing) {
       if (dispenseStartWeight === 0 && convexSettings?.currentWeight !== undefined) {
@@ -134,11 +127,10 @@ export const Dashboard: React.FC = () => {
     }
   }, [isDispensing, convexSettings?.currentWeight, dispenseStartWeight]);
 
-  const dispensedGrams = isDispensing 
+  const dispensedGrams = isDispensing
     ? Math.max(0, (convexSettings?.currentWeight ?? 0) - dispenseStartWeight)
     : 0;
 
-  // Feed Now manual action
   const handleFeedNow = async () => {
     const activeOwner = ownerId || 'demo_owner_id';
     await dispenseFood(activeOwner, portionWeight);
@@ -159,10 +151,9 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Convert recent feedings to timeline activities
   const recentActivities = feedHistory.slice(0, 4).map((event) => ({
     id: event._id,
-    message: event.completed 
+    message: event.completed
       ? `Dispensed ${event.amountDispensed}g successfully`
       : `Failed to dispense ${event.amountDispensed}g`,
     time: new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -176,7 +167,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <section className="p-4 md:p-8 space-y-6 max-w-[1440px] mx-auto w-full">
-      {/* Header Section */}
+
       <div className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-slate-950 via-emerald-950 to-teal-900 px-6 py-7 md:px-9 md:py-8 text-white shadow-xl shadow-emerald-950/10">
         <div className="absolute -top-20 right-16 w-52 h-52 rounded-full bg-emerald-300/10 blur-3xl"></div>
         <div className="absolute -bottom-24 -right-8 w-64 h-64 rounded-full border-[32px] border-white/[0.04]"></div>
@@ -194,7 +185,7 @@ export const Dashboard: React.FC = () => {
               <p className="text-sm text-slate-300 mt-1.5">Live recognition, feeding and wellbeing in one calm overview.</p>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => navigate('/settings')}
             className="self-start md:self-auto px-5 py-3 rounded-xl bg-white text-emerald-900 font-bold text-xs hover:bg-emerald-50 hover:shadow-lg transition-all duration-200 active:scale-95 flex items-center gap-2 cursor-pointer shrink-0"
           >
@@ -204,12 +195,11 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Bento Grid */}
       <div className="bento-grid">
-        {/* Large Status Card (Span 12) - System Status */}
+
         <div className="col-span-12 glass-card p-8 flex flex-col justify-between relative overflow-hidden bg-white">
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-          
+
           <div className="relative z-10">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
               <div className="flex items-center gap-3">
@@ -248,7 +238,6 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Metrics Grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               <div className="space-y-1">
                 <p className="text-xs text-on-surface-variant font-medium">Food Portion</p>
@@ -257,8 +246,8 @@ export const Dashboard: React.FC = () => {
               <div className="space-y-1 col-span-1 md:col-span-1">
                 <div className="flex justify-between items-center mr-2">
                   <p className="text-xs text-on-surface-variant font-medium">Remaining Food</p>
-                  <button 
-                    onClick={() => setIsRefilling(true)} 
+                  <button
+                    onClick={() => setIsRefilling(true)}
                     className="text-[10px] text-primary font-bold hover:underline cursor-pointer"
                   >
                     Refill
@@ -271,8 +260,8 @@ export const Dashboard: React.FC = () => {
                   </p>
                 </div>
                 <div className="w-full h-1.5 bg-outline-variant/30 rounded-full overflow-hidden mt-1.5">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-all duration-500" 
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-500"
                     style={{ width: `${remainingPercentage}%` }}
                   ></div>
                 </div>
@@ -318,10 +307,10 @@ export const Dashboard: React.FC = () => {
                 {lastDetectionTimeStr}
               </span>
               <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                lastDetection?.authorized 
-                  ? 'bg-primary/10 text-primary' 
-                  : lastDetection 
-                    ? 'bg-error/10 text-error' 
+                lastDetection?.authorized
+                  ? 'bg-primary/10 text-primary'
+                  : lastDetection
+                    ? 'bg-error/10 text-error'
                     : 'bg-surface-variant text-on-surface-variant'
               }`}>
                 {lastDetection?.authorized ? "Verified AI" : lastDetection ? "Unrecognized" : "No Activity"}
@@ -330,7 +319,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Live Camera Section (Span 12) */}
         <div className="col-span-12 glass-card overflow-hidden bg-white">
           <div className="p-6 border-b border-outline-variant flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -341,7 +329,7 @@ export const Dashboard: React.FC = () => {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={() => navigate('/camera')}
                 className="p-2 rounded-full hover:bg-surface-container-highest transition-colors active:scale-95 cursor-pointer"
               >
@@ -350,10 +338,10 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-col lg:flex-row">
-            {/* Stream View */}
+
             <div className="lg:w-2/3 aspect-video bg-black relative group cursor-pointer flex items-center justify-center" onClick={() => navigate('/camera')}>
               {cameraStreamUrl ? (
-                <img 
+                <img
                   className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300"
                   src={cameraStreamUrl}
                   alt="ESP32 Live Feed"
@@ -375,9 +363,9 @@ export const Dashboard: React.FC = () => {
                 </div>
               )}
             </div>
-            {/* Controls & AI Summary */}
+
             <div className="lg:w-1/3 p-6 flex flex-col justify-between gap-6 bg-surface-container-low border-l border-outline-variant/20">
-              {/* AI Recognition Summary Panel */}
+
               <div className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 p-5 rounded-3xl border border-emerald-400/15 text-white shadow-xl shadow-slate-900/10">
                 <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-emerald-400/10 blur-2xl"></div>
                 <div className="relative space-y-4">
@@ -426,12 +414,12 @@ export const Dashboard: React.FC = () => {
               </div>
 
               <div className="w-full flex flex-col gap-3">
-                <button 
+                <button
                   disabled={isDispensing}
                   onClick={handleFeedNow}
                   className={`w-full py-3.5 rounded-xl font-bold text-sm hover:shadow-lg active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer ${
                     isDispensing
-                      ? 'bg-primary/50 text-white cursor-not-allowed' 
+                      ? 'bg-primary/50 text-white cursor-not-allowed'
                       : 'bg-primary text-on-primary hover:bg-primary-container shadow-md'
                   }`}
                 >
@@ -454,11 +442,10 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Recent Activity Section (Span 12) */}
         <div className="col-span-12 glass-card p-8 flex flex-col bg-white">
           <div className="flex items-center justify-between mb-8">
             <h4 className="font-bold text-lg text-on-surface">Recent Activity</h4>
-            <button 
+            <button
               onClick={() => navigate('/history')}
               className="text-primary font-bold text-sm hover:underline cursor-pointer"
             >
@@ -468,13 +455,13 @@ export const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {recentActivities.length > 0 ? (
               recentActivities.map((event) => (
-                <div 
+                <div
                   key={event.id}
                   className="flex gap-4 p-4 rounded-2xl bg-[#f8f9ff] border border-outline-variant/30 hover:border-primary/20 transition-all duration-200"
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
-                    event.type === 'feeding' 
-                      ? 'bg-primary text-white' 
+                    event.type === 'feeding'
+                      ? 'bg-primary text-white'
                       : 'bg-error text-white'
                   }`}>
                     <span className="material-symbols-outlined text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -496,7 +483,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Refill Container Modal */}
       {isRefilling && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-xs">
           <div className="bg-white rounded-3xl border border-outline-variant p-8 max-w-sm w-full space-y-6 shadow-2xl">
@@ -507,7 +493,7 @@ export const Dashboard: React.FC = () => {
             <form onSubmit={handleRefillSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-1.5">Initial Capacity (grams)</label>
-                <input 
+                <input
                   type="number"
                   required
                   value={refillWeight}
@@ -516,14 +502,14 @@ export const Dashboard: React.FC = () => {
                 />
               </div>
               <div className="flex gap-3 justify-end pt-2">
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsRefilling(false)}
                   className="px-5 py-2.5 bg-surface-container hover:bg-surface-container-high rounded-xl font-bold text-xs text-on-surface-variant transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
                   className="px-5 py-2.5 bg-primary hover:bg-primary-container text-white rounded-xl font-bold text-xs transition-colors cursor-pointer"
                 >

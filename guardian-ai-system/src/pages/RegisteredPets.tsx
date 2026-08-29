@@ -17,7 +17,7 @@ export const RegisteredPets: React.FC = () => {
   const { user } = useUser();
   const ownerId = user?.id || '';
 
-  // Queries & Mutations
+
   const rawPets = useSafeQuery(api.pets.list, { ownerId }, []);
   const addPet = useSafeMutation(api.pets.add);
   const updatePet = useSafeMutation(api.pets.update);
@@ -27,12 +27,12 @@ export const RegisteredPets: React.FC = () => {
   const localSavedPets = JSON.parse(localStorage.getItem('guardian_local_pets') || '[]');
   const pets = (rawPets && rawPets.length > 0) ? rawPets : localSavedPets;
 
-  // UI state
+
   const [isAdding, setIsAdding] = useState(false);
   const [editingPet, setEditingPet] = useState<Pet | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Form fields
+
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('Cat');
   const [breed, setBreed] = useState('');
@@ -48,12 +48,12 @@ export const RegisteredPets: React.FC = () => {
   const [foodType, setFoodType] = useState('Complete dry food');
   const [allergies, setAllergies] = useState('');
   const [medicalConditions, setMedicalConditions] = useState('');
-  
-  // File attachments state
+
+
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [trainingFiles, setTrainingFiles] = useState<FileList | null>(null);
 
-  // Upload file helper with timeout
+
   const uploadFileToConvex = async (file: File): Promise<string> => {
     const uploadUrl = await generateUploadUrl();
     if (!uploadUrl) throw new Error('Could not create a Convex upload URL.');
@@ -163,7 +163,7 @@ export const RegisteredPets: React.FC = () => {
       const updatedLocal = [...existingLocal.filter((p: any) => (p._id || p.id || '').toString() !== savedPetId), newLocalPet];
       localStorage.setItem('guardian_local_pets', JSON.stringify(updatedLocal));
 
-      // Save reference photo(s) for LiveCamera AI engine
+
       const refMap = JSON.parse(localStorage.getItem('guardian_referencePhotos') || '{}');
       if (profileImageDataUrl) {
         const base64Only = profileImageDataUrl.split(',')[1] || profileImageDataUrl;
@@ -173,7 +173,7 @@ export const RegisteredPets: React.FC = () => {
       }
       localStorage.setItem('guardian_referencePhotos', JSON.stringify(refMap));
 
-      // Save multi-photos dataset map
+
       const multiRefMap = JSON.parse(localStorage.getItem('guardian_referencePhotos_multi') || '{}');
       multiRefMap[savedPetId] = trainingImagesBase64.map(img => img.split(',')[1] || img);
       if (profileImageDataUrl) {
@@ -416,7 +416,7 @@ export const RegisteredPets: React.FC = () => {
           <h3 className="font-bold text-3xl text-on-surface tracking-tight">Pet Profiles</h3>
           <p className="text-sm text-on-surface-variant">Add and manage your pets (cats, dogs, rabbits, parrots, and more).</p>
         </div>
-        <button 
+        <button
           onClick={() => {
             setIsAdding(true);
             setName('');
@@ -455,7 +455,7 @@ export const RegisteredPets: React.FC = () => {
           <p className="text-sm text-on-surface-variant text-center max-w-xs mb-6">
             Add a pet so the AI system can recognize it on camera and authorize feeding.
           </p>
-          <button 
+          <button
             onClick={() => setIsAdding(true)}
             className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-bold text-xs shadow-md"
           >
@@ -467,16 +467,16 @@ export const RegisteredPets: React.FC = () => {
       {pets !== undefined && pets.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {pets.map((pet: Pet) => (
-            <div 
-              key={pet._id} 
+            <div
+              key={pet._id}
               className="bg-white rounded-[24px] overflow-hidden shadow-sm border border-outline-variant/30 group hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
             >
               <div className="relative h-48 w-full bg-surface-container flex items-center justify-center overflow-hidden">
                 {pet.profileImage ? (
-                  <img 
-                    className="w-full h-full object-cover" 
-                    src={pet.profileImage} 
-                    alt={pet.name} 
+                  <img
+                    className="w-full h-full object-cover"
+                    src={pet.profileImage}
+                    alt={pet.name}
                   />
                 ) : (
                   <span className="material-symbols-outlined text-[64px] text-on-surface-variant/40">pets</span>
@@ -487,16 +487,16 @@ export const RegisteredPets: React.FC = () => {
                   </span>
                 </div>
                 <div className="absolute bottom-4 right-4 flex gap-2 opacity-100 z-10">
-                  <button 
+                  <button
                     onClick={() => handleStartEdit(pet)}
-                    className="p-2 bg-white/95 backdrop-blur rounded-lg shadow-md hover:bg-primary hover:text-white transition-all text-on-surface-variant flex items-center justify-center" 
+                    className="p-2 bg-white/95 backdrop-blur rounded-lg shadow-md hover:bg-primary hover:text-white transition-all text-on-surface-variant flex items-center justify-center"
                     title="Edit"
                   >
                     <span className="material-symbols-outlined text-[18px]">edit</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDeletePet(pet._id || pet.id)}
-                    className="p-2 bg-white/95 backdrop-blur rounded-lg shadow-md hover:bg-error hover:text-white transition-all text-error hover:text-white" 
+                    className="p-2 bg-white/95 backdrop-blur rounded-lg shadow-md hover:bg-error hover:text-white transition-all text-error hover:text-white"
                     title="Delete"
                   >
                     <span className="material-symbols-outlined text-[18px]">delete</span>
@@ -531,8 +531,8 @@ export const RegisteredPets: React.FC = () => {
           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-outline-variant/30 space-y-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center">
               <h3 className="font-bold text-lg text-on-surface">Add Pet</h3>
-              <button 
-                onClick={() => setIsAdding(false)} 
+              <button
+                onClick={() => setIsAdding(false)}
                 className="p-1 rounded-full hover:bg-surface-container transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -541,10 +541,10 @@ export const RegisteredPets: React.FC = () => {
             <form onSubmit={handleAddPet} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Pet Name *</label>
-                <input 
-                  type="text" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="ex: Luna, Amigo, Rex, Felix..."
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:border-primary"
@@ -553,10 +553,10 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Species / Pet Type</label>
-                <input 
-                  type="text" 
-                  value={species} 
-                  onChange={(e) => setSpecies(e.target.value)} 
+                <input
+                  type="text"
+                  value={species}
+                  onChange={(e) => setSpecies(e.target.value)}
                   placeholder="e.g. Cat, Dog, Rabbit, Parrot, Hamster"
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:border-primary"
                 />
@@ -564,10 +564,10 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Breed (Optional)</label>
-                <input 
-                  type="text" 
-                  value={breed} 
-                  onChange={(e) => setBreed(e.target.value)} 
+                <input
+                  type="text"
+                  value={breed}
+                  onChange={(e) => setBreed(e.target.value)}
                   placeholder="ex: Siberiana, Maidanez, Perus, etc."
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none"
                 />
@@ -575,10 +575,10 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Age (Optional)</label>
-                <input 
-                  type="text" 
-                  value={age} 
-                  onChange={(e) => setAge(e.target.value)} 
+                <input
+                  type="text"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
                   placeholder="ex: 1 an, 6 luni, 2 ani..."
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none"
                 />
@@ -615,8 +615,8 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant block">Profile Photo (Cover)</label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*"
                   onChange={(e) => setProfileFile(e.target.files ? e.target.files[0] : null)}
                   className="text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
@@ -632,8 +632,8 @@ export const RegisteredPets: React.FC = () => {
                     </span>
                   )}
                 </label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*"
                   multiple
                   onChange={(e) => setTrainingFiles(e.target.files)}
@@ -644,9 +644,9 @@ export const RegisteredPets: React.FC = () => {
                   <div className="grid grid-cols-4 gap-2 pt-2 max-h-36 overflow-y-auto p-2 bg-surface-container-low rounded-xl border border-outline-variant/30">
                     {Array.from(trainingFiles).map((file, idx) => (
                       <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-outline-variant/40 group">
-                        <img 
-                          src={URL.createObjectURL(file)} 
-                          alt={`Preview ${idx + 1}`} 
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
@@ -663,16 +663,16 @@ export const RegisteredPets: React.FC = () => {
               )}
 
               <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   disabled={isUploading}
-                  onClick={() => setIsAdding(false)} 
+                  onClick={() => setIsAdding(false)}
                   className="px-5 py-2.5 bg-surface-container hover:bg-surface-container-high rounded-xl text-xs font-bold"
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isUploading}
                   className="px-5 py-2.5 bg-primary text-on-primary hover:shadow-lg rounded-xl text-xs font-bold flex items-center gap-1.5"
                 >
@@ -689,8 +689,8 @@ export const RegisteredPets: React.FC = () => {
           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-outline-variant/30 space-y-6 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center">
               <h3 className="font-bold text-lg text-on-surface">Edit Pet Profile</h3>
-              <button 
-                onClick={() => setEditingPet(null)} 
+              <button
+                onClick={() => setEditingPet(null)}
                 className="p-1 rounded-full hover:bg-surface-container transition-colors"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -699,10 +699,10 @@ export const RegisteredPets: React.FC = () => {
             <form onSubmit={handleEditPetSubmit} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Pet Name *</label>
-                <input 
-                  type="text" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="ex: Luna"
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:border-primary"
@@ -711,10 +711,10 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Species / Pet Type</label>
-                <input 
-                  type="text" 
-                  value={species} 
-                  onChange={(e) => setSpecies(e.target.value)} 
+                <input
+                  type="text"
+                  value={species}
+                  onChange={(e) => setSpecies(e.target.value)}
                   placeholder="e.g. Cat, Dog, Rabbit, Parrot, Hamster"
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none focus:border-primary"
                 />
@@ -722,10 +722,10 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Breed</label>
-                <input 
-                  type="text" 
-                  value={breed} 
-                  onChange={(e) => setBreed(e.target.value)} 
+                <input
+                  type="text"
+                  value={breed}
+                  onChange={(e) => setBreed(e.target.value)}
                   placeholder="ex: Siberiana, Perus..."
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none"
                 />
@@ -733,10 +733,10 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant">Age</label>
-                <input 
-                  type="text" 
-                  value={age} 
-                  onChange={(e) => setAge(e.target.value)} 
+                <input
+                  type="text"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
                   placeholder="ex: 2 ani..."
                   className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none"
                 />
@@ -773,8 +773,8 @@ export const RegisteredPets: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-on-surface-variant block">Change Profile Photo</label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*"
                   onChange={(e) => setProfileFile(e.target.files ? e.target.files[0] : null)}
                   className="text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
@@ -790,8 +790,8 @@ export const RegisteredPets: React.FC = () => {
                     </span>
                   )}
                 </label>
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*"
                   multiple
                   onChange={(e) => setTrainingFiles(e.target.files)}
@@ -802,9 +802,9 @@ export const RegisteredPets: React.FC = () => {
                   <div className="grid grid-cols-4 gap-2 pt-2 max-h-36 overflow-y-auto p-2 bg-surface-container-low rounded-xl border border-outline-variant/30">
                     {Array.from(trainingFiles).map((file, idx) => (
                       <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-outline-variant/40 group">
-                        <img 
-                          src={URL.createObjectURL(file)} 
-                          alt={`Preview ${idx + 1}`} 
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity">
@@ -821,16 +821,16 @@ export const RegisteredPets: React.FC = () => {
               )}
 
               <div className="flex gap-3 justify-end pt-4 border-t border-outline-variant/30">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   disabled={isUploading}
-                  onClick={() => setEditingPet(null)} 
+                  onClick={() => setEditingPet(null)}
                   className="px-5 py-2.5 bg-surface-container hover:bg-surface-container-high rounded-xl text-xs font-bold"
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isUploading}
                   className="px-5 py-2.5 bg-primary text-on-primary hover:shadow-lg rounded-xl text-xs font-bold"
                 >

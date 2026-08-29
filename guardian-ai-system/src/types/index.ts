@@ -1,11 +1,11 @@
 export interface FeederSettings {
-  portionWeight: number; // grams
-  cooldownMinutes: number; // minutes
-  maxTemperature: number; // °C
-  initialFoodAdded: number; // grams
+  portionWeight: number;
+  cooldownMinutes: number;
+  maxTemperature: number;
+  initialFoodAdded: number;
   wifiSsid: string;
-  wifiSignal: string; // 'Excellent' | 'Good' | 'Fair' | 'Weak'
-  signalStrength: number; // dBm
+  wifiSignal: string;
+  signalStrength: number;
   systemOnline: boolean;
   lastSyncTime: string;
   uptime: string;
@@ -13,7 +13,7 @@ export interface FeederSettings {
   arduinoStatus: 'Active' | 'Inactive';
   nodemcuStatus: 'Connected' | 'Disconnected';
   esp32CamStatus: 'Streaming Ready' | 'Offline';
-  cameraStreamUrl: string; // ESP32-CAM stream URL
+  cameraStreamUrl: string;
   notificationsEnabled: {
     feedingSuccessful: boolean;
     lowFoodWarning: boolean;
@@ -22,13 +22,13 @@ export interface FeederSettings {
 }
 
 export interface Pet {
-  _id: string; // Convex document ID
-  id?: string; // Compatibility alias used by local UI models
+  _id: string;
+  id?: string;
   ownerId?: string;
   name: string;
-  species: string; // e.g. "Cat" | "Dog"
+  species: string;
   breed?: string;
-  age?: string; // e.g. "2y 4m"
+  age?: string;
   weightKg?: number;
   dailyGoalGrams?: number;
   lifeStage?: string;
@@ -40,18 +40,18 @@ export interface Pet {
   foodType?: string;
   allergies?: string;
   medicalConditions?: string;
-  profileImage?: string; // Convex storage ID or external URL
+  profileImage?: string;
   trainingImages?: string[];
-  aiModelStatus?: string; // "Trained" | "Training" | "Not Trained"
+  aiModelStatus?: string;
   isActive?: boolean;
   createdAt?: number;
-  lastSeen?: string; // transient UI support
-  lastFeeding?: string; // transient UI support
-  trainingPhotosCount?: number; // transient UI support
+  lastSeen?: string;
+  lastFeeding?: string;
+  trainingPhotosCount?: number;
 }
 
 export interface AISettings {
-  model1Enabled: boolean; // Cat/Dog/Human/Unknown detection
-  model2Enabled: boolean; // Authorized/Unknown comparison
+  model1Enabled: boolean;
+  model2Enabled: boolean;
   notificationsEnabled: boolean;
 }

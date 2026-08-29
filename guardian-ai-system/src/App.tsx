@@ -19,7 +19,7 @@ export const App: React.FC = () => {
     <Providers>
       <BrowserRouter>
         <Routes>
-          {/* Public Authentication Routes */}
+
           <Route
             path="/sign-in"
             element={
@@ -47,7 +47,6 @@ export const App: React.FC = () => {
             }
           />
 
-          {/* Protected Application Routes */}
           <Route
             path="*"
             element={

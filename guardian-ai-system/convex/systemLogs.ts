@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// List system logs
 export const list = query({
   args: { ownerId: v.optional(v.string()) },
   handler: async (ctx, args) => {
@@ -13,7 +12,6 @@ export const list = query({
   },
 });
 
-// Add a system log item
 export const add = mutation({
   args: {
     ownerId: v.optional(v.string()),

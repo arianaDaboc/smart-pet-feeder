@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// List notifications for the owner
 export const list = query({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {
@@ -13,7 +12,6 @@ export const list = query({
   },
 });
 
-// Add a notification alert
 export const add = mutation({
   args: {
     ownerId: v.string(),
@@ -41,17 +39,16 @@ export const add = mutation({
   },
 });
 
-// Mark a single notification or all notifications as read
 export const markRead = mutation({
-  args: { 
+  args: {
     ownerId: v.string(),
-    id: v.optional(v.id("notifications")) 
+    id: v.optional(v.id("notifications"))
   },
   handler: async (ctx, args) => {
     if (args.id) {
       await ctx.db.patch(args.id, { read: true });
     } else {
-      // Mark all as read for this owner
+
       const unread = await ctx.db
         .query("notifications")
         .withIndex("by_ownerId", (q) => q.eq("ownerId", args.ownerId))
@@ -66,7 +63,6 @@ export const markRead = mutation({
   },
 });
 
-// Clear all notifications for the owner
 export const clearAll = mutation({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {
@@ -81,7 +77,6 @@ export const clearAll = mutation({
   },
 });
 
-// Delete a single notification by ID
 export const remove = mutation({
   args: { id: v.id("notifications") },
   handler: async (ctx, args) => {

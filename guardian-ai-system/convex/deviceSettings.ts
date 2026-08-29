@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Get device settings. If they do not exist, insert defaults.
 export const get = query({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {
@@ -17,7 +16,6 @@ export const get = query({
       };
     }
 
-    // Default configuration if none exists
     return {
       ownerId: args.ownerId,
       foodPortion: 45,
@@ -50,7 +48,6 @@ export const get = query({
   },
 });
 
-// Update device settings, or insert if not present
 export const update = mutation({
   args: {
     ownerId: v.string(),
@@ -129,7 +126,7 @@ export const update = mutation({
       if (args.activeDietMealsPerDay !== undefined) patchData.activeDietMealsPerDay = args.activeDietMealsPerDay;
       if (args.previousFoodPortion !== undefined) patchData.previousFoodPortion = args.previousFoodPortion;
     }
-    
+
     if (args.clearRawScaleValue === true) {
       patchData.rawScaleValue = undefined;
     } else if (args.rawScaleValue !== undefined) {
@@ -146,7 +143,7 @@ export const update = mutation({
       await ctx.db.patch(existing._id, patchData);
       return existing._id;
     } else {
-      // Insert new settings row
+
       const defaultSettings = {
         ownerId: args.ownerId,
         foodPortion: args.foodPortion ?? 45,

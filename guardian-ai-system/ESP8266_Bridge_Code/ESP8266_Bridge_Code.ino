@@ -4,20 +4,15 @@
 #include <SoftwareSerial.h>
 #include <ESP8266WebServer.h>
 
-// ------------------- WI-FI CONFIGURATION -------------------
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
 
-// ------------------- CONVEX CONFIGURATION -------------------
 const char* convexHost = "YOUR_DEPLOYMENT.convex.site";
 const char* ownerId = "YOUR_CLERK_USER_ID";
 
-// ------------------- SERIAL SETUP -------------------
-// RX = D5 (GPIO14), TX = D6 (GPIO12)
 SoftwareSerial arduinoSerial(D5, D6);
 ESP8266WebServer localServer(80);
 
-// ------------------- QUEUE STRUCTURE FOR OFFLINE RELIABILITY -------------------
 struct FeedEvent {
   float weight;
   float temp;
@@ -33,7 +28,7 @@ int queueCount = 0;
 
 void pushQueue(float w, float t, float h, String src) {
   if (queueCount >= QUEUE_MAX) {
-    // Overwrite oldest
+    // Keep the newest offline events when the fixed queue is full.
     queueTail = (queueTail + 1) % QUEUE_MAX;
     queueCount--;
   }
@@ -45,34 +40,28 @@ void pushQueue(float w, float t, float h, String src) {
   queueCount++;
 }
 
-// ------------------- STATE VARIABLES -------------------
 String deviceStatus = "BOOTING";
 bool online = false;
 bool wifiWasConnected = false;
 unsigned long lastHeartbeatMillis = 0;
 unsigned long lastWifiCheckMillis = 0;
 
-// Telemetry state
 float currentTemp = 0.0;
 float currentHum = 0.0;
 float currentWeight = 0.0;
 
-// Polling and posting intervals
 unsigned long lastSettingsPollMillis = 0;
 unsigned long lastTelemetryUploadMillis = 0;
 
-// Sync tracking
 bool lastPendingFeed = false;
 float lastPortion = -1.0;
 int lastCooldown = -1;
 String lastExecutedCommand = "";
 
-// ACK control
 bool feedRequestPendingAck = false;
 unsigned long lastFeedRequestTime = 0;
 String pendingAckCommand = "CMD:WAIT_MOTION";
 
-// Serial Buffer
 String inputBuffer = "";
 
 void addCorsHeaders() {
@@ -115,7 +104,6 @@ void handleLocalManualFeed() {
     return;
   }
 
-  // Apply the portion selected in the app immediately, before dispensing.
   const String body = localServer.arg("plain");
   const int amountIndex = body.indexOf("\"amount\":");
   if (amountIndex != -1) {
@@ -148,8 +136,6 @@ void handleLocalStatus() {
   payload += "\"}";
   localServer.send(200, "application/json", payload);
 }
-
-// ------------------- HTTP POST FUNCTIONS -------------------
 
 bool postFeedEvent(float weight, float temp, float hum, String source) {
   if (WiFi.status() != WL_CONNECTED) return false;
@@ -243,7 +229,7 @@ void processQueue() {
       queueTail = (queueTail + 1) % QUEUE_MAX;
       queueCount--;
     } else {
-      break; // connection issue or endpoint failure, stop and retry later
+      break;
     }
   }
 }
@@ -265,10 +251,8 @@ void pollDeviceSettings() {
     if (httpCode == HTTP_CODE_OK || httpCode == 200) {
       String payload = http.getString();
 
-      // Simple manual JSON parsing
       bool pendingFeed = (payload.indexOf("\"pendingFeedRequest\":true") != -1);
 
-      // Extract pendingCommand
       String pendingCommand = "";
       int cmdIndex = payload.indexOf("\"pendingCommand\":\"");
       if (cmdIndex != -1) {
@@ -279,7 +263,6 @@ void pollDeviceSettings() {
         }
       }
 
-      // Extract foodPortion
       float portion = -1.0;
       int portionIndex = payload.indexOf("\"foodPortion\":");
       if (portionIndex != -1) {
@@ -291,7 +274,6 @@ void pollDeviceSettings() {
         }
       }
 
-      // Extract cooldownMinutes cleanly
       int cooldown = -1;
       int cooldownIndex = payload.indexOf("\"cooldownMinutes\"");
       if (cooldownIndex != -1) {
@@ -307,7 +289,6 @@ void pollDeviceSettings() {
         }
       }
 
-      // Action on settings changes
       if (pendingCommand.length() > 0) {
         if (pendingCommand != lastExecutedCommand) {
           lastExecutedCommand = pendingCommand;
@@ -315,8 +296,7 @@ void pollDeviceSettings() {
           Serial.println(pendingCommand);
           arduinoSerial.println(pendingCommand);
         }
-        
-        // Immediately clear the pendingCommand on the backend
+
         postTelemetry(currentTemp, currentHum, currentWeight, online, deviceStatus, WiFi.RSSI(), -999.0, -999.0, true);
       } else {
         lastExecutedCommand = "";
@@ -326,9 +306,8 @@ void pollDeviceSettings() {
         arduinoSerial.println("CMD:WAIT_MOTION");
         lastFeedRequestTime = millis();
         feedRequestPendingAck = true;
-        lastPendingFeed = true; // Lock locally so it never loops if Convex is slow to clear
-        
-        // Immediately clear the pendingFeedRequest on the backend
+        lastPendingFeed = true;
+
         postTelemetry(currentTemp, currentHum, currentWeight, online, deviceStatus, WiFi.RSSI(), -999.0, -999.0, false, true);
       } else if (!pendingFeed) {
         lastPendingFeed = false;
@@ -343,20 +322,17 @@ void pollDeviceSettings() {
       if (cooldown > 0 && cooldown != lastCooldown) {
         lastCooldown = cooldown;
         arduinoSerial.print("CMD:SET_COOLDOWN:");
-        arduinoSerial.println(cooldown * 60); // minutes to seconds
+        arduinoSerial.println(cooldown * 60);
       }
     }
     http.end();
   }
 }
 
-// ------------------- SERIAL PARSER -------------------
-
 void parseArduinoMessage(String msg) {
   msg.trim();
   if (!msg.startsWith("EVT:")) return;
 
-  // Any valid protocol message proves that Arduino is alive and serial works.
   lastHeartbeatMillis = millis();
   online = true;
 
@@ -382,10 +358,10 @@ void parseArduinoMessage(String msg) {
     postTelemetry(currentTemp, currentHum, currentWeight, online, deviceStatus, WiFi.RSSI());
   }
   else if (msg == "EVT:FEEDING_END") {
-    // Will transition state through EVT:STATUS
+
   }
   else if (msg.startsWith("EVT:TELEMETRY:")) {
-    // Format: EVT:TELEMETRY:temp:hum:weight:status
+
     int firstColon = msg.indexOf(':', 14);
     int secondColon = msg.indexOf(':', firstColon + 1);
     int thirdColon = msg.indexOf(':', secondColon + 1);
@@ -402,7 +378,7 @@ void parseArduinoMessage(String msg) {
     }
   }
   else if (msg.startsWith("EVT:SUMMARY:")) {
-    // Format: EVT:SUMMARY:weight:temp:hum:source
+
     int firstColon = msg.indexOf(':', 12);
     int secondColon = msg.indexOf(':', firstColon + 1);
     int thirdColon = msg.indexOf(':', secondColon + 1);
@@ -414,10 +390,9 @@ void parseArduinoMessage(String msg) {
       String src = msg.substring(thirdColon + 1);
 
       if (!postFeedEvent(w, t, h, src)) {
-        pushQueue(w, t, h, src); // Queue failed event
+        pushQueue(w, t, h, src);
       }
-      
-      // Update telemetry immediately to reflect final weight/cooldown
+
       postTelemetry(t, h, w, online, deviceStatus, WiFi.RSSI());
     }
   }
@@ -443,14 +418,12 @@ void parseArduinoMessage(String msg) {
   }
 }
 
-// ------------------- SETUP -------------------
 void setup() {
   Serial.begin(115200);
   arduinoSerial.begin(9600);
 
   Serial.println("\n--- ESP8266 Wi-Fi Bridge Started ---");
 
-  // Enable persistent auto-reconnect
   WiFi.persistent(true);
   WiFi.setAutoReconnect(true);
   WiFi.mode(WIFI_STA);
@@ -464,16 +437,14 @@ void setup() {
   localServer.on("/status", HTTP_OPTIONS, handleCorsPreflight);
   localServer.begin();
   Serial.println("Local feeder API started on port 80.");
-  
+
   lastWifiCheckMillis = millis();
   lastHeartbeatMillis = millis();
 }
 
-// ------------------- MAIN LOOP -------------------
 void loop() {
   localServer.handleClient();
 
-  // Read Serial inputs from Arduino
   while (arduinoSerial.available() > 0) {
     char c = arduinoSerial.read();
     if (c == '\n') {
@@ -482,7 +453,7 @@ void loop() {
       parseArduinoMessage(inputBuffer);
       inputBuffer = "";
     } else if (c != '\r') {
-      // Prevent malformed/noisy serial data from growing the String forever.
+
       if (inputBuffer.length() < 160) {
         inputBuffer += c;
       } else {
@@ -492,33 +463,30 @@ void loop() {
     }
   }
 
-  // Handle Command Re-transmission (ACK wait)
   if (feedRequestPendingAck && (millis() - lastFeedRequestTime > 5000)) {
     Serial.println("No ACK received for FEED command, retrying...");
     arduinoSerial.println(pendingAckCommand);
     lastFeedRequestTime = millis();
   }
 
-  // Monitor Wi-Fi connection status smoothly
   if (WiFi.status() == WL_CONNECTED) {
     if (!wifiWasConnected) {
       wifiWasConnected = true;
       Serial.print("Wi-Fi Connected! IP: ");
       Serial.println(WiFi.localIP());
-      arduinoSerial.println("CMD:CAM_ONLINE"); // Tell Arduino that connection is restored!
+      arduinoSerial.println("CMD:CAM_ONLINE");
       postTelemetry(currentTemp, currentHum, currentWeight, online, deviceStatus, WiFi.RSSI());
     }
-    // Process local failed event queue when online
+
     processQueue();
   } else {
     if (wifiWasConnected) {
       wifiWasConnected = false;
       online = false;
       deviceStatus = "OFFLINE";
-      arduinoSerial.println("CMD:CAM_OFFLINE"); // Fallback to standalone mode if offline!
+      arduinoSerial.println("CMD:CAM_OFFLINE");
     }
-    
-    // Only attempt manual reconnect after 30 seconds without interrupting negotiation
+
     if (millis() - lastWifiCheckMillis > 30000) {
       lastWifiCheckMillis = millis();
       Serial.println("Retrying Wi-Fi connection...");
@@ -526,7 +494,6 @@ void loop() {
     }
   }
 
-  // Monitor Arduino Heartbeat (30-second timeout)
   if (online && (millis() - lastHeartbeatMillis > 30000)) {
     Serial.println("Arduino Heartbeat TIMEOUT! Feeder offline.");
     online = false;
@@ -536,7 +503,6 @@ void loop() {
 
   unsigned long now = millis();
 
-  // Poll configuration settings from Convex every 15 seconds (quota optimization)
   if (now - lastSettingsPollMillis >= 15000) {
     lastSettingsPollMillis = now;
     if (WiFi.status() == WL_CONNECTED) {
@@ -544,7 +510,6 @@ void loop() {
     }
   }
 
-  // Upload telemetry data every 10 seconds
   if (now - lastTelemetryUploadMillis >= 10000) {
     lastTelemetryUploadMillis = now;
     if (WiFi.status() == WL_CONNECTED) {

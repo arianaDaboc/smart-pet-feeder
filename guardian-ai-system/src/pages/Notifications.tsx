@@ -65,7 +65,6 @@ export const Notifications: React.FC = () => {
     }
   };
 
-  // Sort newest first
   const notifications: NotificationDoc[] = (notificationsList || [])
     .slice()
     .sort((a, b) => b.createdAt - a.createdAt);
@@ -75,7 +74,6 @@ export const Notifications: React.FC = () => {
     return n.type === activeFilter;
   });
 
-  // Split notifications into groups (Today, Yesterday, Older)
   const getDayDiff = (timestamp: number) => {
     const now = new Date();
     const date = new Date(timestamp);
@@ -103,7 +101,7 @@ export const Notifications: React.FC = () => {
 
   return (
     <section className="p-4 md:p-8 space-y-6 max-w-[1000px] mx-auto w-full min-h-screen">
-      {/* Page Header */}
+
       <div className="flex justify-between items-end">
         <div>
           <h3 className="font-bold text-3xl text-on-surface tracking-tight">Notifications</h3>
@@ -111,16 +109,15 @@ export const Notifications: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-2 flex-wrap">
           {['all', 'Feeding', 'Detection', 'Warning', 'Temperature', 'AI'].map((filter) => (
-            <button 
+            <button
               key={filter}
               onClick={() => setActiveFilter(filter as any)}
               className={`px-5 py-2 text-xs font-bold rounded-full shadow-sm active:scale-95 transition-all ${
-                activeFilter === filter 
-                  ? 'bg-primary text-on-primary' 
+                activeFilter === filter
+                  ? 'bg-primary text-on-primary'
                   : 'bg-white border border-outline-variant hover:bg-surface-container-low text-on-surface-variant'
               }`}
             >
@@ -128,16 +125,16 @@ export const Notifications: React.FC = () => {
             </button>
           ))}
         </div>
-        
+
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={handleMarkAllAsRead}
             className="flex items-center gap-2 text-primary font-bold text-xs hover:underline active:scale-95 transition-all"
           >
             <span className="material-symbols-outlined text-[18px]">done_all</span>
             <span>Mark all as read ({unreadCount} unread)</span>
           </button>
-          <button 
+          <button
             onClick={handleClearAll}
             className="flex items-center gap-2 text-on-surface-variant opacity-75 font-bold text-xs hover:text-error active:scale-95 transition-all"
           >
@@ -147,7 +144,6 @@ export const Notifications: React.FC = () => {
         </div>
       </div>
 
-      {/* Loading State */}
       {notificationsList === undefined && (
         <div className="bg-white rounded-2xl border border-outline-variant/30 overflow-hidden divide-y divide-outline-variant/20">
           {[1, 2, 3].map(n => (
@@ -162,10 +158,9 @@ export const Notifications: React.FC = () => {
         </div>
       )}
 
-      {/* Notifications List */}
       {notificationsList !== undefined && (
         <div className="bg-white rounded-2xl shadow-sm border border-outline-variant/30 overflow-hidden">
-          {/* Today Group */}
+
           {todayNotifications.length > 0 && (
             <>
               <div className="px-6 py-4 bg-[#f8f9ff] border-b border-outline-variant/30">
@@ -177,7 +172,6 @@ export const Notifications: React.FC = () => {
             </>
           )}
 
-          {/* Yesterday Group */}
           {yesterdayNotifications.length > 0 && (
             <>
               <div className="px-6 py-4 bg-[#f8f9ff] border-b border-outline-variant/30">
@@ -189,7 +183,6 @@ export const Notifications: React.FC = () => {
             </>
           )}
 
-          {/* Older Group */}
           {olderNotifications.length > 0 && (
             <>
               <div className="px-6 py-4 bg-[#f8f9ff] border-b border-outline-variant/30">
@@ -201,7 +194,6 @@ export const Notifications: React.FC = () => {
             </>
           )}
 
-          {/* Empty State */}
           {filteredNotifications.length === 0 && (
             <div className="p-12 text-center flex flex-col items-center">
               <span className="material-symbols-outlined text-4xl text-outline-variant mb-3">notifications_off</span>
@@ -212,7 +204,6 @@ export const Notifications: React.FC = () => {
         </div>
       )}
 
-      {/* Settings Preference Shortcut */}
       <div className="bg-[#f8f9ff] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between border border-primary/10 gap-4">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-white rounded-full shadow-sm text-primary">
@@ -223,7 +214,7 @@ export const Notifications: React.FC = () => {
             <p className="text-xs text-on-surface-variant">Control which alerts you receive and how often.</p>
           </div>
         </div>
-        <button 
+        <button
           onClick={() => navigate('/settings')}
           className="px-6 py-2.5 bg-white text-primary border border-outline-variant font-bold text-xs rounded-full shadow-sm hover:bg-surface-container-low transition-all active:scale-95 shrink-0"
         >
@@ -234,7 +225,6 @@ export const Notifications: React.FC = () => {
   );
 };
 
-// NotificationCard Sub-component
 interface NotificationCardProps {
   notification: NotificationDoc;
   onClick: (id: string) => void;
@@ -272,7 +262,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onCli
   };
 
   return (
-    <div 
+    <div
       onClick={() => onClick(notification._id)}
       className={`relative p-6 flex gap-5 border-b border-outline-variant/30 transition-colors cursor-pointer group ${
         !notification.read ? 'bg-primary/[0.03] hover:bg-primary/[0.07]' : 'hover:bg-surface-container-low'
@@ -293,7 +283,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, onCli
           </h4>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-semibold text-on-surface-variant shrink-0">{formatTime(notification.createdAt)}</span>
-            <button 
+            <button
               onClick={(e) => onDelete(e, notification._id)}
               className="p-1 rounded text-on-surface-variant hover:text-error hover:bg-surface-container-highest opacity-0 group-hover:opacity-100 transition-opacity"
               title="Delete notification"

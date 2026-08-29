@@ -16,8 +16,8 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
   return (
     <header className="sticky top-0 z-40 bg-surface/80 backdrop-blur-md border-b border-outline-variant h-[72px] flex justify-between items-center px-4 md:px-8 w-full">
       <div className="flex items-center gap-3">
-        {/* Menu toggle button for mobile/tablet */}
-        <button 
+
+        <button
           onClick={onMenuClick}
           className="p-2 rounded-full hover:bg-surface-container-highest lg:hidden text-on-surface-variant active:scale-95 transition-all flex items-center justify-center shrink-0"
         >
@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-6">
-        {/* Device Connectivity Status */}
+
         <div className="hidden sm:flex flex-col items-end">
           <p className="text-[10px] font-bold text-primary uppercase tracking-wider">
             {settings.systemOnline ? 'System Online' : 'System Offline'}
@@ -39,7 +39,6 @@ export const Header: React.FC<HeaderProps> = ({ title, onMenuClick }) => {
 
         <div className="w-[1px] h-6 bg-outline-variant/60"></div>
 
-        {/* Notifications Icon */}
         <button
           onClick={() => navigate('/notifications')}
           className="p-2 rounded-full hover:bg-surface-container-highest transition-colors relative active:scale-95"

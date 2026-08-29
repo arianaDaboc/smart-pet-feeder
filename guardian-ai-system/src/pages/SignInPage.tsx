@@ -4,7 +4,7 @@ import { SignIn } from '@clerk/clerk-react';
 export const SignInPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#f8f9ff] flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Brand Background Overlays */}
+
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none"></div>
       <div className="absolute -bottom-48 -left-48 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -13,10 +13,10 @@ export const SignInPage: React.FC = () => {
           <h1 className="font-bold text-3xl text-primary tracking-tight">Guardian AI</h1>
           <p className="text-sm text-on-surface-variant font-medium">Please sign in to access your pet feeder dashboard</p>
         </div>
-        
+
         <div className="w-full shadow-2xl rounded-3xl overflow-hidden border border-outline-variant/30 bg-white">
-          <SignIn 
-            signUpUrl="/sign-up" 
+          <SignIn
+            signUpUrl="/sign-up"
             afterSignInUrl="/"
             appearance={{
               elements: {

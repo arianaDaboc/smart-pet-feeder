@@ -26,7 +26,7 @@ export async function getEmbedding(imageBuffer: Buffer): Promise<number[]> {
   const values = Array.from(output.data as Float32Array);
   const norm = Math.sqrt(values.reduce((sum, value) => sum + value * value, 0));
   if (!Number.isFinite(norm) || norm <= 0) throw new Error('CLIP returned an invalid embedding.');
-  // Do not rely on pipeline normalize: Transformers.js versions differ here.
+
   return values.map(value => value / norm);
 }
 

@@ -14,14 +14,14 @@ export interface RegisteredPet {
 export interface ReferencePhoto {
   petId: string;
   name: string;
-  imageBase64: string; // raw base64, no data:image/... prefix
+  imageBase64: string;
 }
 
 export interface AIInferenceInput {
   imageBase64?: string;
   imageElement?: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
   registeredPets?: RegisteredPet[];
-  referencePhotos?: ReferencePhoto[]; // one reference photo per registered pet
+  referencePhotos?: ReferencePhoto[];
   confidenceThreshold?: number;
   aiMode?: string;
   teachableModelUrl?: string;
@@ -86,9 +86,6 @@ function elementToBase64(el: HTMLImageElement | HTMLVideoElement | HTMLCanvasEle
   }
 }
 
-// ============================================================
-// ENGINE A: COCO-SSD — generic "is there an animal here?" (local TensorFlow)
-// ============================================================
 export class PluggableAIRecognitionEngine implements IAIInferenceEngine {
   private modelName: string = "COCO-SSD";
   private modelVersion: string = "mobilenet_v2";
@@ -207,7 +204,7 @@ export class PluggableAIRecognitionEngine implements IAIInferenceEngine {
 
       if (matchingPet) {
         return {
-          // COCO-SSD recognizes only a species, never an individual identity.
+
           detected: true, confidence, label: `${displayLabel} (Identity not verified)`, petMatch: "UNAUTHORIZED",
           modelInfo: { name: this.modelName, version: this.modelVersion, inferenceTimeMs: latency },
           diagnostics: { bestClass: rawDetectedClass, bestScore: confidence, rawPredictionsCount: predictions.length, stage: "coco-ssd", reasoning: "Species detection cannot prove that this is the registered pet. Visual reference verification is required." }
@@ -234,9 +231,6 @@ export class PluggableAIRecognitionEngine implements IAIInferenceEngine {
 
 export const defaultAIEngine = new PluggableAIRecognitionEngine();
 
-// ============================================================
-// ENGINE B: Teachable Machine
-// ============================================================
 export class TeachableMachineEngine implements IAIInferenceEngine {
   private model: any = null;
   private modelUrl: string = "";
@@ -302,9 +296,6 @@ export class TeachableMachineEngine implements IAIInferenceEngine {
 
 export const teachableAIEngine = new TeachableMachineEngine();
 
-// ============================================================
-// ENGINE C: Gemini 2.5 Flash Vision Compare — ZERO TRAINING
-// ============================================================
 export class VisualReferenceAIEngine implements IAIInferenceEngine {
   async recognize(input: AIInferenceInput): Promise<AIInferenceResult> {
     const startTime = performance.now();
@@ -426,9 +417,6 @@ Return valid JSON only, without markdown (\`\`\`json):`
 
 export const visualReferenceAIEngine = new VisualReferenceAIEngine();
 
-// ============================================================
-// ENGINE D: Qwen2-VL / Qwen-VL Vision API Engine via OpenRouter
-// ============================================================
 export class QwenVisionAIEngine implements IAIInferenceEngine {
   async recognize(input: AIInferenceInput): Promise<AIInferenceResult> {
     const startTime = performance.now();
@@ -539,7 +527,6 @@ Return exactly this JSON object:
       const registeredPets = input.registeredPets || [];
       const refs = input.referencePhotos || [];
 
-      // 1. Cadru gol (Empty background)
       if (!parsed.detected) {
         return {
           detected: false, confidence: parsed.confidence || 0, label: "None", petMatch: "UNKNOWN",
@@ -548,7 +535,6 @@ Return exactly this JSON object:
         };
       }
 
-      // 2. Verificare potrivire animal autorizat
       const matchedNameStr = String(parsed.matchedPetName || '').trim().toLowerCase();
       const matchedPet = registeredPets.find(p => p.name.trim().toLowerCase() === matchedNameStr);
       const hasReferenceForMatch = !!matchedPet && refs.some(ref => String(ref.petId) === String(matchedPet.id));
@@ -572,7 +558,6 @@ Return exactly this JSON object:
           };
         }
 
-      // 3. Subiect neautorizat (om, alt animal neînregistrat, obiect neautorizat)
       return {
         detected: true,
         confidence: parsed.confidence || 0.85,
@@ -596,9 +581,6 @@ Return exactly this JSON object:
 
 export const qwenVisionAIEngine = new QwenVisionAIEngine();
 
-// ============================================================
-// ENGINE E: Local CLIP server (Next.js + ONNX on laptop/mini-PC)
-// ============================================================
 export class LocalClipAIEngine implements IAIInferenceEngine {
   async recognize(input: AIInferenceInput): Promise<AIInferenceResult> {
     const startedAt = performance.now();
@@ -649,13 +631,6 @@ export class LocalClipAIEngine implements IAIInferenceEngine {
 
 export const localClipAIEngine = new LocalClipAIEngine();
 
-// ============================================================
-// TOP-LEVEL SMART ENGINE
-// Strict two-stage pipeline:
-// 1. COCO-SSD must first confirm a real animal category.
-// 2. Gemini compares that animal with the saved reference photos.
-// 3. Qwen and Teachable Machine are identity fallbacks only.
-// ============================================================
 export class SmartAIEngine implements IAIInferenceEngine {
   async recognize(input: AIInferenceInput): Promise<AIInferenceResult> {
     let identityFailureReason = "";
@@ -663,8 +638,7 @@ export class SmartAIEngine implements IAIInferenceEngine {
     const geminiKey = localStorage.getItem('guardian_feeder_gemini_api_key') || localStorage.getItem('guardian_gemini_api_key');
     const qwenKey = input.qwenApiKey || localStorage.getItem('guardian_qwen_api_key') || localStorage.getItem('guardian_openrouter_api_key');
 
-    // Primary identity path in every UI mode. This compares the live frame with
-    // the enrolled embeddings; it does not infer identity from a COCO class.
+    // Registered CLIP embeddings are the primary identity check.
     const localResult = await localClipAIEngine.recognize(input);
     if (localResult.label !== 'None (Local CLIP unavailable)') return localResult;
     identityFailureReason = localResult.diagnostics?.reasoning || 'Local CLIP unavailable.';

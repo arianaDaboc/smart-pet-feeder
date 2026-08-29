@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// List feed history items for the owner
 export const list = query({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {
@@ -13,7 +12,6 @@ export const list = query({
   },
 });
 
-// Add feed history log
 export const add = mutation({
   args: {
     ownerId: v.string(),
@@ -37,7 +35,6 @@ export const add = mutation({
       humidity: args.humidity,
     });
 
-    // Update remaining food in deviceSettings
     const settings = await ctx.db
       .query("deviceSettings")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", args.ownerId))
@@ -51,7 +48,6 @@ export const add = mutation({
       });
     }
 
-    // Generate notification alert
     await ctx.db.insert("notifications", {
       ownerId: args.ownerId,
       title: args.completed ? "Feeding Successful" : "Feeding Failed",
@@ -67,7 +63,6 @@ export const add = mutation({
   },
 });
 
-// Clear history logs for the owner
 export const clear = mutation({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {

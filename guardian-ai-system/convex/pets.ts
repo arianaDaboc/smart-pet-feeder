@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// List all active pets for the owner
 export const list = query({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {
@@ -9,17 +8,16 @@ export const list = query({
       .query("pets")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", args.ownerId))
       .collect();
-    
-    // Only return active pets and resolve storage URLs
+
     const activePets = allPets.filter((p) => p.isActive === true);
-    
+
     const resolvedPets = [];
     for (const pet of activePets) {
       let resolvedProfileImage = pet.profileImage;
       if (pet.profileImage && !pet.profileImage.startsWith("http")) {
         resolvedProfileImage = (await ctx.storage.getUrl(pet.profileImage)) || undefined;
       }
-      
+
       const resolvedTrainingImages = [];
       if (pet.trainingImages) {
         for (const img of pet.trainingImages) {
@@ -31,19 +29,18 @@ export const list = query({
           }
         }
       }
-      
+
       resolvedPets.push({
         ...pet,
         profileImage: resolvedProfileImage,
         trainingImages: resolvedTrainingImages,
       });
     }
-    
+
     return resolvedPets;
   },
 });
 
-// Add a pet companion profile
 export const add = mutation({
   args: {
     ownerId: v.string(),
@@ -93,18 +90,16 @@ export const add = mutation({
   },
 });
 
-// Soft delete a pet companion profile
 export const remove = mutation({
   args: { id: v.id("pets") },
   handler: async (ctx, args) => {
-    // Soft deletion: patch isActive = false
+
     await ctx.db.patch(args.id, {
       isActive: false,
     });
   },
 });
 
-// Update a pet companion profile
 export const update = mutation({
   args: {
     id: v.id("pets"),

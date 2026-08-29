@@ -13,18 +13,18 @@ export default defineSchema({
     firstName: v.optional(v.string()),
     lastName: v.optional(v.string()),
   }).index("by_clerkId", ["clerkId"]),
-  
+
   pets: defineTable({
-    ownerId: v.optional(v.string()), // Clerk user ID
+    ownerId: v.optional(v.string()),
     userId: v.optional(v.string()),
     name: v.string(),
-    species: v.string(), // "Cat" | "Dog" | "Human" | "Unknown"
+    species: v.string(),
     breed: v.optional(v.string()),
     age: v.optional(v.string()),
-    profileImage: v.optional(v.string()), // Convex storage ID or external URL
-    trainingImages: v.optional(v.array(v.string())), // Support multiple uploaded images
-    aiModelStatus: v.optional(v.string()), // "Trained" | "Training" | "Not Trained"
-    isActive: v.optional(v.boolean()), // Soft deletion status
+    profileImage: v.optional(v.string()),
+    trainingImages: v.optional(v.array(v.string())),
+    aiModelStatus: v.optional(v.string()),
+    isActive: v.optional(v.boolean()),
     createdAt: v.optional(v.float64()),
     aiLabel: v.optional(v.string()),
     allowedToFeed: v.optional(v.boolean()),
@@ -42,13 +42,13 @@ export default defineSchema({
   }).index("by_ownerId", ["ownerId"]),
 
   deviceSettings: defineTable({
-    ownerId: v.string(), // Clerk ID
+    ownerId: v.string(),
     foodPortion: v.float64(),
     cooldownMinutes: v.float64(),
     maximumTemperature: v.float64(),
     initialFoodAmount: v.float64(),
     estimatedFoodRemaining: v.float64(),
-    foodContainerCapacity: v.float64(), // Capacity of container in grams
+    foodContainerCapacity: v.float64(),
     cameraStreamUrl: v.string(),
     wifiSSID: v.string(),
     notificationsEnabled: v.object({
@@ -76,7 +76,7 @@ export default defineSchema({
   }).index("by_ownerId", ["ownerId"]),
 
   feedHistory: defineTable({
-    ownerId: v.string(), // Clerk ID
+    ownerId: v.string(),
     timestamp: v.float64(),
     amountDispensed: v.float64(),
     feedingMethod: v.union(v.literal("Manual"), v.literal("Automatic")),
@@ -87,7 +87,7 @@ export default defineSchema({
   }).index("by_ownerId", ["ownerId"]),
 
   notifications: defineTable({
-    ownerId: v.string(), // Clerk ID
+    ownerId: v.string(),
     title: v.string(),
     message: v.string(),
     type: v.union(
@@ -108,7 +108,7 @@ export default defineSchema({
     speciesDetected: v.string(),
     confidence: v.float64(),
     authorized: v.boolean(),
-    petMatch: v.optional(v.string()), // "AUTHORIZED" | "UNAUTHORIZED" | "UNKNOWN"
+    petMatch: v.optional(v.string()),
     petId: v.optional(v.string()),
     recognizedPetId: v.optional(v.string()),
     recognizedPetName: v.optional(v.string()),

@@ -13,7 +13,6 @@ export const Settings: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'portion' | 'cooldown' | 'temp' | 'refill' | 'wifi' | 'info' | 'notifications' | 'ai'>('portion');
 
-  // Input states
   const [tempPortion, setTempPortion] = useState(settings.portionWeight);
   const [tempMaxTemp, setTempMaxTemp] = useState(settings.maxTemperature);
   const [refillWeight, setRefillWeight] = useState(settings.initialFoodAdded);
@@ -38,14 +37,12 @@ export const Settings: React.FC = () => {
     localStorage.setItem('guardian_openrouter_api_key', qwenApiKey);
   }, [qwenApiKey]);
 
-
   const convexSettings = useSafeQuery(api.deviceSettings.get, { ownerId }, null);
 
   const [simulateHardware] = useState<boolean>(false);
 
   const isDeviceOnline = simulateHardware || (convexSettings?.online === true && (convexSettings?.lastSeen ? (Date.now() - convexSettings.lastSeen < 20000) : false));
 
-  // Calibration Wizard state
   const [calStep, setCalStep] = useState<1 | 2 | 3>(1);
   const [refWeightInput, setRefWeightInput] = useState<number>(100);
   const [calStatus, setCalStatus] = useState<string>('');
@@ -62,7 +59,6 @@ export const Settings: React.FC = () => {
     }
   }, [isDeviceOnline, isLoading]);
 
-  // Simulation helpers for offline/testing mode
   useEffect(() => {
     if (!simulateHardware || !isLoading || !convexSettings?.pendingCommand) return;
 
@@ -77,7 +73,7 @@ export const Settings: React.FC = () => {
           await updateSettingsMutation({
             ownerId,
             pendingCommand: "",
-            rawScaleValue: 34215, // simulated raw load cell value
+            rawScaleValue: 34215,
           });
         } else if (convexSettings.pendingCommand?.startsWith("CMD:CALIBRATE:")) {
           const parts = convexSettings.pendingCommand.split(":");
@@ -85,7 +81,7 @@ export const Settings: React.FC = () => {
           await updateSettingsMutation({
             ownerId,
             pendingCommand: "",
-            calibrationFactor: 34215 / ref, // simulated calibration factor
+            calibrationFactor: 34215 / ref,
           });
         }
       } catch (err) {
@@ -99,7 +95,6 @@ export const Settings: React.FC = () => {
   useEffect(() => {
     if (!convexSettings) return;
 
-    // Transition from Step 1 when pendingCommand is cleared
     if (calStep === 1 && isLoading) {
       if (!convexSettings.pendingCommand) {
         setIsLoading(false);
@@ -108,14 +103,12 @@ export const Settings: React.FC = () => {
       }
     }
 
-    // Transition from Step 2
     if (calStep === 2 && isLoading) {
       if (!convexSettings.pendingCommand) {
         setIsLoading(false);
       }
     }
 
-    // Transition from Step 3 when calibrationFactor is updated
     if (calStep === 3 && isLoading) {
       if (convexSettings.calibrationFactor !== undefined || !convexSettings.pendingCommand) {
         setIsLoading(false);
@@ -126,7 +119,6 @@ export const Settings: React.FC = () => {
     setPrevPendingCommand(convexSettings.pendingCommand);
   }, [convexSettings?.pendingCommand, convexSettings?.calibrationFactor, calStep, isLoading, prevPendingCommand]);
 
-  // Keep inputs in sync with database values as they load asynchronously
   useEffect(() => {
     setTempPortion(settings.portionWeight);
     setTempMaxTemp(settings.maxTemperature);
@@ -180,8 +172,6 @@ export const Settings: React.FC = () => {
     }
   };
 
-
-
   const toggleNotificationSetting = async (key: 'feedingSuccessful' | 'lowFoodWarning' | 'criticalOverheat') => {
     if (!ownerId) return;
     const newNotifications = {
@@ -202,7 +192,7 @@ export const Settings: React.FC = () => {
 
   return (
     <section className="p-4 md:p-8 space-y-6 max-w-[1440px] mx-auto w-full min-h-screen">
-      {/* Page Header */}
+
       <div className="flex justify-between items-end">
         <div>
           <h3 className="font-bold text-3xl text-on-surface tracking-tight">Device Configuration</h3>
@@ -211,9 +201,9 @@ export const Settings: React.FC = () => {
       </div>
 
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Vertical Tabs Sidebar */}
+
           <nav className="w-full md:w-64 space-y-2 shrink-0">
-            <button 
+            <button
               onClick={() => setActiveTab('portion')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'portion' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -222,7 +212,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">scale</span>
               <span>Food Portion</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('cooldown')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'cooldown' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -231,7 +221,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">timer</span>
               <span>Cooldown Duration</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('temp')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'temp' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -240,7 +230,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">device_thermostat</span>
               <span>Maximum Temperature</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('refill')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'refill' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -249,7 +239,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">inventory_2</span>
               <span>Initial Food Added</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('wifi')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'wifi' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -258,7 +248,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">wifi</span>
               <span>Wi-Fi Settings</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('ai')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'ai' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -267,7 +257,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">psychology</span>
               <span>AI Settings</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('info')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'info' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -276,7 +266,7 @@ export const Settings: React.FC = () => {
               <span className="material-symbols-outlined">info</span>
               <span>Device Information</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('notifications')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-xs font-bold ${
                 activeTab === 'notifications' ? 'bg-white shadow-sm border border-primary/20 text-primary' : 'text-on-surface-variant hover:bg-white/50'
@@ -287,10 +277,8 @@ export const Settings: React.FC = () => {
             </button>
           </nav>
 
-          {/* Configuration Canvas Card */}
           <div className="flex-1 bg-white rounded-3xl border border-outline-variant/30 p-8 shadow-sm">
-            
-            {/* Tab Panel: Food Portion */}
+
             {activeTab === 'portion' && (
               <div className="space-y-8">
                 <div className="flex items-start justify-between">
@@ -302,10 +290,10 @@ export const Settings: React.FC = () => {
                 </div>
                 <div className="p-6 bg-surface-bright rounded-2xl border border-outline-variant/30">
                   <label className="text-sm font-bold block mb-4">Dispense Weight (Grams)</label>
-                  <input 
-                    type="range" 
-                    min="10" 
-                    max="250" 
+                  <input
+                    type="range"
+                    min="10"
+                    max="250"
                     value={tempPortion}
                     onChange={async (e) => {
                       const newPortion = Number(e.target.value);
@@ -327,7 +315,6 @@ export const Settings: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Calibration Wizard Section */}
                 <div className="pt-6 border-t border-outline-variant/30 space-y-4">
                   <button
                     type="button"
@@ -359,7 +346,7 @@ export const Settings: React.FC = () => {
 
                   {isCalibrationOpen && (
                   <div className="bg-surface-bright border border-outline-variant/30 rounded-2xl p-6 space-y-6 animate-in fade-in duration-200">
-                    {/* Device Offline Alert */}
+
                     {!isDeviceOnline && (
                       <div className="p-4 bg-red-50 border border-red-200/50 rounded-xl flex items-start gap-3 text-red-800 max-w-xl mx-auto">
                         <span className="material-symbols-outlined text-base mt-0.5 text-red-600">error</span>
@@ -372,7 +359,6 @@ export const Settings: React.FC = () => {
                       </div>
                     )}
 
-                    {/* Stepper Header */}
                     <div className="flex items-center justify-between max-w-md mx-auto">
                       <div className="flex items-center gap-2">
                         <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${calStep >= 1 ? 'bg-primary text-white font-bold' : 'bg-surface-container text-on-surface-variant'}`}>1</span>
@@ -390,7 +376,6 @@ export const Settings: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Step Content */}
                     <div className="p-6 bg-surface-container-low rounded-xl border border-outline-variant/30 max-w-xl mx-auto space-y-4">
                       {calStep === 1 && (
                         <div className="space-y-4">
@@ -512,7 +497,6 @@ export const Settings: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Status / Loading Output */}
                       {calStatus && (
                         <div className="flex items-center gap-2 text-[11px] text-on-surface-variant font-medium pt-2 border-t border-outline-variant/30">
                           {isLoading && <span className="w-2.5 h-2.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>}
@@ -520,7 +504,6 @@ export const Settings: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Controls to step or restart */}
                       <div className="flex justify-between items-center pt-2">
                         {calStep > 1 && (
                           <button
@@ -576,7 +559,6 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Tab Panel: Cooldown Duration */}
             {activeTab === 'cooldown' && (
               <div className="space-y-6">
                 <div className="flex items-start justify-between">
@@ -589,9 +571,9 @@ export const Settings: React.FC = () => {
                 <div className="p-6 bg-surface-bright rounded-2xl border border-outline-variant/30 max-w-xl">
                   <label className="text-sm font-bold block mb-4">Cooldown Duration (Minutes)</label>
                   <div className="flex items-center gap-4">
-                    <input 
-                      type="range" 
-                      min="1" 
+                    <input
+                      type="range"
+                      min="1"
                       max="720"
                       value={tempCooldown}
                       onChange={(e) => {
@@ -600,8 +582,8 @@ export const Settings: React.FC = () => {
                       }}
                       className="flex-1 h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       min="1"
                       max="720"
                       value={tempCooldown}
@@ -616,7 +598,7 @@ export const Settings: React.FC = () => {
                   <div className="flex justify-between mt-3 text-xs text-on-surface-variant">
                     <span>1 min</span>
                     <span className="text-primary font-bold">
-                      {tempCooldown >= 60 
+                      {tempCooldown >= 60
                         ? `${Math.floor(tempCooldown / 60)}h ${tempCooldown % 60}m`
                         : `${tempCooldown} minutes`
                       }
@@ -627,7 +609,6 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Tab Panel: Maximum Temperature */}
             {activeTab === 'temp' && (
               <div className="space-y-6">
                 <div>
@@ -640,10 +621,10 @@ export const Settings: React.FC = () => {
                   <div className="text-5xl font-bold text-primary mb-2">{tempMaxTemp}°C</div>
                   <div className="text-xs font-bold text-on-surface-variant mb-6 uppercase tracking-wider">Safety Threshold</div>
                   <div className="w-full max-w-sm">
-                    <input 
-                      type="range" 
-                      min="30" 
-                      max="60" 
+                    <input
+                      type="range"
+                      min="30"
+                      max="60"
                       value={tempMaxTemp}
                       onChange={(e) => setTempMaxTemp(Number(e.target.value))}
                       className="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary"
@@ -657,7 +638,6 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Tab Panel: Initial Food Added */}
             {activeTab === 'refill' && (
               <div className="space-y-6">
                 <div>
@@ -669,8 +649,8 @@ export const Settings: React.FC = () => {
                 <form onSubmit={handleRefillSubmit} className="space-y-4 max-w-md">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-on-surface-variant">Container Refill Capacity (Grams)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       value={refillWeight}
                       onChange={(e) => setRefillWeight(Number(e.target.value))}
                       className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none"
@@ -678,7 +658,7 @@ export const Settings: React.FC = () => {
                       max="10000"
                     />
                   </div>
-                  <button 
+                  <button
                     type="submit"
                     className="w-full py-3 bg-primary text-on-primary font-bold text-xs rounded-xl hover:shadow-lg transition-all active:scale-95"
                   >
@@ -691,7 +671,6 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Tab Panel: Wi-Fi Settings */}
             {activeTab === 'wifi' && (
               <div className="space-y-6">
                 <div>
@@ -715,9 +694,9 @@ export const Settings: React.FC = () => {
                 <div className="space-y-3 max-w-md">
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-on-surface-variant">Network SSID</label>
-                    <input 
-                      type="text" 
-                      value={wifiSsidInput} 
+                    <input
+                      type="text"
+                      value={wifiSsidInput}
                       onChange={(e) => setWifiSsidInput(e.target.value)}
                       className="w-full px-4 py-2 border border-outline-variant rounded-xl text-sm focus:outline-none"
                     />
@@ -726,20 +705,18 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Tab Panel: Device Information */}
             {activeTab === 'info' && (
               <div className="space-y-6">
                 <div>
                   <h3 className="font-bold text-lg text-on-surface">Device Information</h3>
                   <p className="text-xs text-on-surface-variant mt-1">Diagnose hardware components, firmware builds, and connectivity links.</p>
                 </div>
-                
-                {/* ESP32-CAM Stream URL Input */}
+
                 <div className="p-6 bg-surface rounded-2xl border border-outline-variant/30 space-y-4">
                   <h4 className="font-bold text-sm text-on-surface">ESP32-CAM Stream Configuration</h4>
                   <div className="space-y-2">
                     <label className="text-xs font-semibold text-on-surface-variant block">Camera MJPEG Stream URL</label>
-                    <input 
+                    <input
                       type="url"
                       value={streamUrl}
                       onChange={(e) => setStreamUrl(e.target.value)}
@@ -796,7 +773,6 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Tab Panel: Notification Preferences */}
             {activeTab === 'notifications' && (
               <div className="space-y-6">
                 <div>
@@ -807,9 +783,9 @@ export const Settings: React.FC = () => {
                   <div className="flex items-center justify-between py-4 border-b border-outline-variant/30">
                     <span className="text-sm font-semibold text-on-surface">Feeding Successful</span>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={settings.notificationsEnabled.feedingSuccessful} 
+                      <input
+                        type="checkbox"
+                        checked={settings.notificationsEnabled.feedingSuccessful}
                         onChange={() => toggleNotificationSetting('feedingSuccessful')}
                         className="sr-only peer"
                       />
@@ -819,9 +795,9 @@ export const Settings: React.FC = () => {
                   <div className="flex items-center justify-between py-4 border-b border-outline-variant/30">
                     <span className="text-sm font-semibold text-on-surface">Low Food Warning</span>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={settings.notificationsEnabled.lowFoodWarning} 
+                      <input
+                        type="checkbox"
+                        checked={settings.notificationsEnabled.lowFoodWarning}
                         onChange={() => toggleNotificationSetting('lowFoodWarning')}
                         className="sr-only peer"
                       />
@@ -831,9 +807,9 @@ export const Settings: React.FC = () => {
                   <div className="flex items-center justify-between py-4">
                     <span className="text-sm font-semibold text-on-surface">Critical Overheat Alerts</span>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={settings.notificationsEnabled.criticalOverheat} 
+                      <input
+                        type="checkbox"
+                        checked={settings.notificationsEnabled.criticalOverheat}
                         onChange={() => toggleNotificationSetting('criticalOverheat')}
                         className="sr-only peer"
                       />
@@ -923,7 +899,6 @@ export const Settings: React.FC = () => {
               </div>
             )}
 
-            {/* Global Actions Footer */}
             <footer className="mt-12 pt-8 border-t border-outline-variant/30 flex flex-wrap items-center justify-end gap-4">
               {saveNotice && (
                 <div className={`mr-auto flex items-center gap-2 px-3.5 py-2 rounded-xl text-[11px] font-bold border ${
@@ -935,7 +910,7 @@ export const Settings: React.FC = () => {
                   {saveNotice === 'success' ? 'Changes saved successfully.' : 'Changes could not be saved.'}
                 </div>
               )}
-              <button 
+              <button
                 onClick={() => {
                   setTempPortion(settings.portionWeight);
                   setTempMaxTemp(settings.maxTemperature);
@@ -948,7 +923,7 @@ export const Settings: React.FC = () => {
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={handleSaveChanges}
                 className="px-8 py-2.5 bg-primary text-white font-bold text-xs rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
               >

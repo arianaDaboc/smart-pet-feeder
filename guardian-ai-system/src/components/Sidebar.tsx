@@ -24,9 +24,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
-      {/* Backdrop overlay for mobile */}
+
       {isOpen && (
-        <div 
+        <div
           onClick={onClose}
           className="fixed inset-0 bg-black/40 z-40 lg:hidden backdrop-blur-xs transition-opacity duration-300"
         />
@@ -40,8 +40,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <h1 className="font-bold text-2xl text-primary tracking-tight">Guardian AI</h1>
             <p className="text-on-surface-variant text-xs opacity-75 font-medium tracking-wide">Intelligent Pet Care</p>
           </div>
-          {/* Close button for mobile */}
-          <button 
+
+          <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-surface-container lg:hidden text-on-surface-variant"
           >

@@ -21,13 +21,10 @@ export const LiveCamera: React.FC = () => {
 
   const convexSettings: any = rawSettings || { deviceStatus: "STANDBY", foodPortion: 45, cameraStreamUrl: "http://192.168.100.49:81/stream", cooldownMinutes: 1 };
 
-  // FIX: keep isDispensing synced to the REAL device status from Convex,
-  // instead of relying only on a blind local timeout.
   useEffect(() => {
     if (rawSettings) syncFromConvex(rawSettings);
   }, [rawSettings, syncFromConvex]);
 
-  // Combine Convex pets with local storage fallback pets so they persist across reloads
   const localSavedPets = (() => {
     try {
       const saved = localStorage.getItem('guardian_local_pets');
@@ -42,7 +39,7 @@ export const LiveCamera: React.FC = () => {
     }
   })();
 
-  const registeredPets = [...(rawPets || []), ...localSavedPets].filter((pet, index, self) => 
+  const registeredPets = [...(rawPets || []), ...localSavedPets].filter((pet, index, self) =>
     index === self.findIndex((p) => (p._id || p.id || p.name) === (pet._id || pet.id || pet.name))
   );
   const hasNoPetsRegistered = registeredPets.length === 0;
@@ -54,7 +51,6 @@ export const LiveCamera: React.FC = () => {
   const addNotificationMutation = useSafeMutation(api.notifications.add);
   const updateDeviceSettingsMutation = useSafeMutation(api.deviceSettings.update);
 
-  // System activity logs state
   interface SystemLog {
     id: string;
     time: string;
@@ -86,7 +82,6 @@ export const LiveCamera: React.FC = () => {
     }
   }, [hasNoPetsRegistered, addLog]);
 
-  // AI State
   const [aiResult, setAiResult] = useState<AIInferenceResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [autoScanEnabled, setAutoScanEnabled] = useState<boolean>(() => {
@@ -100,7 +95,6 @@ export const LiveCamera: React.FC = () => {
   });
   const [aiMode] = useState<string>('real');
 
-  // Teachable Machine Model URL
   const [teachableModelUrl] = useState<string>(() => {
     return localStorage.getItem('guardian_teachable_model_url') || localStorage.getItem('guardian_teachableModelUrl') || '';
   });
@@ -109,7 +103,6 @@ export const LiveCamera: React.FC = () => {
     localStorage.setItem('guardian_teachableModelUrl', teachableModelUrl);
   }, [teachableModelUrl]);
 
-  // Gemini & Qwen Vision API keys + reference photos
   const [geminiApiKey] = useState<string>(() => {
     return localStorage.getItem('guardian_feeder_gemini_api_key') || localStorage.getItem('guardian_gemini_api_key') || '';
   });
@@ -144,7 +137,6 @@ export const LiveCamera: React.FC = () => {
 
   const customCameraUrl = localStorage.getItem('guardian_custom_camera_url') || "";
 
-  // Stream URL calculation
   const rawStreamUrl = customCameraUrl || convexSettings?.cameraStreamUrl || "";
   const isUnsplashFake = rawStreamUrl.includes('unsplash.com');
   const baseStreamUrl = (rawStreamUrl && !isUnsplashFake) ? rawStreamUrl : "http://192.168.100.49:81/stream";
@@ -170,7 +162,6 @@ export const LiveCamera: React.FC = () => {
     updateDeviceSettingsMutation({ ownerId, pendingCommand: cmd });
   }, [streamError, aiMode, ownerId]);
 
-  // Refs
   const triggerScanRef = useRef<any>(null);
   const nextSnapshotTimeoutRef = useRef<any>(null);
   const consecutiveAuthorizedCountRef = useRef(0);
@@ -392,7 +383,7 @@ export const LiveCamera: React.FC = () => {
         } else if (referencePhotosMap[p.id]) {
           referencePhotos.push({ petId: p.id, name: p.name, imageBase64: referencePhotosMap[p.id] });
         } else {
-          // Restore reference images from Convex when this browser has no local cache.
+
           const storedPet: any = registeredPets.find((pet: any) => String(pet._id || pet.id) === String(p.id));
           const remoteImages = [storedPet?.profileImage, ...(storedPet?.trainingImages || [])]
             .filter((value: unknown): value is string => typeof value === 'string' && value.length > 0)
@@ -412,7 +403,6 @@ export const LiveCamera: React.FC = () => {
         }
       }
 
-      // Synchronize each saved reference with the persistent local CLIP database once.
       const localAiUrl = (localStorage.getItem('guardian_local_ai_url') || 'http://127.0.0.1:3000').replace(/\/$/, '');
       const enrollmentCache: Record<string, boolean> = JSON.parse(localStorage.getItem('guardian_clip_enrollment_cache') || '{}');
       for (const reference of referencePhotos) {
@@ -504,8 +494,7 @@ export const LiveCamera: React.FC = () => {
           lastAuthorizedPetDetectedTimestampRef.current = now;
           lastAuthorizedPetNameRef.current = result.recognizedPetName || result.label;
 
-          // PIR is deliberately evaluated by Arduino only after this AI authorization.
-          // A previously reported motion event must never authorize a new feeding.
+          // Arduino evaluates PIR only after the visual authorization is delivered.
           const isPIRMotionActive = false;
 
           const candidatePetId = String(result.recognizedPetId || result.recognizedPetName || "");
@@ -536,7 +525,7 @@ export const LiveCamera: React.FC = () => {
             if (!isPIRMotionActive) {
               sendHTTPResultToESP32(true);
               const portion = convexSettings?.foodPortion ?? 45;
-              await dispenseFood(ownerId, portion, true); // Sends WAIT_MOTION, never opens the lid directly.
+              await dispenseFood(ownerId, portion, true);
               triggeredFeed = true;
               addLog(`Camera recognized ${result.recognizedPetName || result.label} (${Math.round(result.confidence * 100)}%). Authorization sent to feeder. Waiting for PIR motion (10s)...`, 'info');
             } else if (isCooldown) {
@@ -708,9 +697,6 @@ export const LiveCamera: React.FC = () => {
 
     addLog(`MANUAL COMMAND: Starting feeding (${portion}g)...`, "success");
 
-    // Manual requests cannot impersonate an AI authorization.
-
-    // 2. Real Hardware Dispatch via Convex Cloud -> ESP8266 Wi-Fi Bridge -> Arduino SoftwareSerial
     addLog(`Sending hardware command through Convex Cloud to ESP8266 (pendingFeedRequest = true)...`, "info");
     const success = await dispenseFood(activeOwner, portion);
 

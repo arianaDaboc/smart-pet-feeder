@@ -11,7 +11,6 @@ export const History: React.FC = () => {
   const { user } = useUser();
   const ownerId = user?.id || '';
 
-  // Convex Queries safely
   const feedHistory = useSafeQuery(api.feedHistory.list, { ownerId }, []);
   const aiRecognition = useSafeQuery(api.aiRecognition.list, { ownerId }, []);
   const notificationsList = useSafeQuery(api.notifications.list, { ownerId }, []);
@@ -21,7 +20,6 @@ export const History: React.FC = () => {
   const [petFilter, setPetFilter] = useState<'all' | string>('all');
   const [showPetDropdown, setShowPetDropdown] = useState(false);
 
-  // Merge and format history events
   const events = [
     ...feedHistory.map(f => ({
       id: f._id,
@@ -44,7 +42,7 @@ export const History: React.FC = () => {
       timestamp: ai.timestamp,
       type: 'detection',
       title: ai.authorized ? 'Authorized Pet Detected' : 'Unknown Animal Alert',
-      message: ai.authorized 
+      message: ai.authorized
         ? `${ai.recognizedPetName || 'Authorized pet'} identified at feeder.`
         : `Unknown ${ai.speciesDetected || 'animal'} detected at feeder frame.`,
       petName: ai.recognizedPetName || 'Unknown',
@@ -76,7 +74,6 @@ export const History: React.FC = () => {
     }))
   ];
 
-  // Dynamic filter lists
   const now = Date.now();
   const startOfToday = new Date().setHours(0, 0, 0, 0);
   const oneWeekAgo = now - 7 * 24 * 60 * 60 * 1000;
@@ -84,22 +81,19 @@ export const History: React.FC = () => {
 
   const filteredEvents = events.filter((event) => {
     if (feedingOnly && event.type !== 'feeding') return false;
-    // Time filter logic
+
     if (filterRange === 'today' && event.timestamp < startOfToday) return false;
     if (filterRange === 'week' && event.timestamp < oneWeekAgo) return false;
     if (filterRange === 'month' && event.timestamp < oneMonthAgo) return false;
 
-    // Pet name filter logic
     if (petFilter !== 'all' && event.petName !== petFilter) return false;
 
     return true;
   }).sort((a, b) => b.timestamp - a.timestamp);
 
-  // Group events by day for visual layout
   const todayEvents = filteredEvents.filter(e => e.timestamp >= startOfToday);
   const olderEvents = filteredEvents.filter(e => e.timestamp < startOfToday);
 
-  // CSV Export utility using real Convex data
   const exportToCSV = () => {
     const headers = ['ID', 'Timestamp', 'Type', 'Title', 'Message', 'Pet Name', 'Status'];
     const rows = filteredEvents.map((e) => [
@@ -125,7 +119,7 @@ export const History: React.FC = () => {
 
   return (
     <section className="p-4 md:p-8 space-y-6 max-w-[1440px] mx-auto w-full min-h-screen">
-      {/* Page Header */}
+
       <div className="flex justify-between items-end">
         <div>
           <h3 className="font-bold text-3xl text-on-surface tracking-tight">{feedingOnly ? 'Feeding History' : 'Activity History'}</h3>
@@ -133,10 +127,9 @@ export const History: React.FC = () => {
         </div>
       </div>
 
-      {/* Filters Section */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center bg-surface-container-low p-1 rounded-xl border border-outline-variant/60">
-          <button 
+          <button
             onClick={() => setFilterRange('today')}
             className={`px-6 py-2 rounded-lg font-bold text-xs transition-all ${
               filterRange === 'today' ? 'bg-white shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'
@@ -144,7 +137,7 @@ export const History: React.FC = () => {
           >
             Today
           </button>
-          <button 
+          <button
             onClick={() => setFilterRange('week')}
             className={`px-6 py-2 rounded-lg font-bold text-xs transition-all ${
               filterRange === 'week' ? 'bg-white shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'
@@ -152,7 +145,7 @@ export const History: React.FC = () => {
           >
             Week
           </button>
-          <button 
+          <button
             onClick={() => setFilterRange('month')}
             className={`px-6 py-2 rounded-lg font-bold text-xs transition-all ${
               filterRange === 'month' ? 'bg-white shadow-sm text-primary' : 'text-on-surface-variant hover:text-on-surface'
@@ -164,7 +157,7 @@ export const History: React.FC = () => {
 
         <div className="flex items-center gap-4">
           <div className="relative">
-            <button 
+            <button
               onClick={() => setShowPetDropdown(!showPetDropdown)}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-outline-variant rounded-xl font-bold text-xs hover:border-primary transition-colors"
             >
@@ -176,14 +169,14 @@ export const History: React.FC = () => {
             </button>
             {showPetDropdown && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white shadow-xl rounded-xl border border-outline-variant p-2 z-[60]">
-                <div 
+                <div
                   onClick={() => { setPetFilter('all'); setShowPetDropdown(false); }}
                   className="px-4 py-2 hover:bg-surface-container-low rounded-lg cursor-pointer font-bold text-xs"
                 >
                   All Pets
                 </div>
                 {pets.map(p => (
-                  <div 
+                  <div
                     key={p._id}
                     onClick={() => { setPetFilter(p.name); setShowPetDropdown(false); }}
                     className="px-4 py-2 hover:bg-surface-container-low rounded-lg cursor-pointer font-bold text-xs"
@@ -194,8 +187,8 @@ export const History: React.FC = () => {
               </div>
             )}
           </div>
-          
-          <button 
+
+          <button
             onClick={exportToCSV}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-xl font-bold text-xs shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
           >
@@ -205,9 +198,8 @@ export const History: React.FC = () => {
         </div>
       </div>
 
-      {/* History Timeline */}
       <div className="space-y-12">
-        {/* Today Group */}
+
         {todayEvents.length > 0 && (
           <div>
             <h3 className="font-bold text-xs text-on-surface-variant uppercase tracking-[0.2em] mb-6 flex items-center gap-4">
@@ -222,7 +214,6 @@ export const History: React.FC = () => {
           </div>
         )}
 
-        {/* Older Group */}
         {olderEvents.length > 0 && (
           <div>
             <h3 className="font-bold text-xs text-on-surface-variant uppercase tracking-[0.2em] mb-6 flex items-center gap-4">
@@ -238,7 +229,6 @@ export const History: React.FC = () => {
         )}
       </div>
 
-      {/* Empty State */}
       {filteredEvents.length === 0 && (
         <div className="mt-12 flex flex-col md:flex-row items-center gap-8 bg-surface-container-low/50 rounded-3xl p-8 border border-dashed border-outline-variant justify-center text-center">
           <div className="space-y-2">
@@ -253,7 +243,6 @@ export const History: React.FC = () => {
   );
 };
 
-// TimelineCard Sub-component
 interface TimelineCardProps {
   event: {
     id: string;
@@ -276,12 +265,12 @@ interface TimelineCardProps {
 const TimelineCard: React.FC<TimelineCardProps> = ({ event }) => {
   return (
     <div className="timeline-item group relative pl-12 timeline-line">
-      {/* Circle Icon Badge */}
+
       <div className={`absolute left-2 top-2 w-5 h-5 rounded-full border-4 border-white shadow-sm z-10 ${
-        event.type === 'feeding' 
-          ? 'bg-primary' 
-          : event.type === 'alert' 
-            ? 'bg-error' 
+        event.type === 'feeding'
+          ? 'bg-primary'
+          : event.type === 'alert'
+            ? 'bg-error'
             : 'bg-secondary'
       }`}></div>
 
@@ -293,10 +282,10 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ event }) => {
             </div>
           ) : (
             <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
-              event.type === 'feeding' 
-                ? 'bg-primary/10 text-primary' 
-                : event.type === 'alert' 
-                  ? 'bg-error/10 text-error' 
+              event.type === 'feeding'
+                ? 'bg-primary/10 text-primary'
+                : event.type === 'alert'
+                  ? 'bg-error/10 text-error'
                   : 'bg-secondary/10 text-secondary'
             }`}>
               <span className="material-symbols-outlined text-lg">
@@ -308,10 +297,10 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ event }) => {
             <div className="flex items-center gap-2">
               <span className="font-bold text-base text-on-surface">{event.title}</span>
               <span className={`px-2 py-0.5 rounded-full font-bold text-[9px] uppercase ${
-                event.type === 'feeding' 
-                  ? 'bg-primary/10 text-primary' 
-                  : event.type === 'alert' 
-                    ? 'bg-error/10 text-error' 
+                event.type === 'feeding'
+                  ? 'bg-primary/10 text-primary'
+                  : event.type === 'alert'
+                    ? 'bg-error/10 text-error'
                     : 'bg-secondary/10 text-secondary'
               }`}>
                 {event.type}
@@ -321,7 +310,6 @@ const TimelineCard: React.FC<TimelineCardProps> = ({ event }) => {
           </div>
         </div>
 
-        {/* Details Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-12 flex-grow w-full lg:w-auto">
           {event.type === 'feeding' ? (
             <>

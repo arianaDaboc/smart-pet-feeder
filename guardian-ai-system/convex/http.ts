@@ -4,7 +4,6 @@ import { api } from "./_generated/api";
 
 const http = httpRouter();
 
-// GET /api/device-settings?ownerId=...
 http.route({
   path: "/api/device-settings",
   method: "GET",
@@ -33,7 +32,6 @@ http.route({
   }),
 });
 
-// POST /api/telemetry
 http.route({
   path: "/api/telemetry",
   method: "POST",
@@ -78,7 +76,6 @@ http.route({
   }),
 });
 
-// POST /api/feed-event
 http.route({
   path: "/api/feed-event",
   method: "POST",
@@ -91,7 +88,6 @@ http.route({
         return new Response("Missing ownerId", { status: 400 });
       }
 
-      // Map triggerSource ("PIR", "WEB", "MANUAL_BUTTON") to Convex expected values
       let convexTrigger: "PIR" | "Button" | "Web" | "Bluetooth" = "Button";
       let feedingMethod: "Manual" | "Automatic" = "Manual";
 
@@ -106,7 +102,6 @@ http.route({
         feedingMethod = "Manual";
       }
 
-      // 1. Add to feed history
       await ctx.runMutation(api.feedHistory.add, {
         ownerId,
         amountDispensed: amountDispensed !== undefined ? parseFloat(amountDispensed) : 0,
@@ -117,7 +112,6 @@ http.route({
         humidity: humidity !== undefined ? parseFloat(humidity) : 45.0,
       });
 
-      // 2. Clear pendingFeedRequest
       await ctx.runMutation(api.deviceSettings.update, {
         ownerId,
         pendingFeedRequest: false,

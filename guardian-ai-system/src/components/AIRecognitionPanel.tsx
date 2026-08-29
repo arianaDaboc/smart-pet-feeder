@@ -26,7 +26,7 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
   scanIntervalMs = 1500,
   onChangeScanInterval,
 }) => {
-  // Determine display state
+
   const getAIStatusText = () => {
     if (isCooldown) return { text: 'Cooldown Active', color: 'text-rose-500', bg: 'bg-rose-500/10' };
     if (isAnalyzing) return { text: 'Detecting...', color: 'text-amber-500', bg: 'bg-amber-500/10' };
@@ -66,7 +66,7 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
 
   return (
     <div className="bg-white rounded-3xl border border-outline-variant/30 p-6 shadow-sm space-y-6">
-      {/* Header */}
+
       <div className="flex items-center justify-between pb-4 border-b border-outline-variant/20">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
@@ -77,16 +77,14 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
             <p className="text-xs text-on-surface-variant">Real-time camera frame inference</p>
           </div>
         </div>
-        
-        {/* Status Pill */}
+
         <span className={`px-3 py-1 rounded-full text-xs font-bold ${status.bg} ${status.color} ${isCooldown ? 'animate-pulse' : ''}`}>
           {status.text}
         </span>
       </div>
 
-      {/* Primary Metrics Grid */}
       <div className="grid grid-cols-2 gap-4">
-        {/* Detected Label */}
+
         <div className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/20">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Detected Label</p>
           <p className="font-bold text-lg text-on-surface">
@@ -94,7 +92,6 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
           </p>
         </div>
 
-        {/* Confidence Score */}
         <div className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/20">
           <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Confidence</p>
           <p className="font-bold text-lg text-on-surface">
@@ -102,7 +99,6 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
           </p>
         </div>
 
-        {/* Pet Match Recommendation */}
         <div className="col-span-2 p-4 rounded-2xl bg-surface-container-low border border-outline-variant/20 flex justify-between items-center">
           <div>
             <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-0.5">Pet Match</p>
@@ -112,7 +108,6 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
         </div>
       </div>
 
-      {/* AI Model Diagnostic Information Panel */}
       <div className="p-4 rounded-2xl bg-slate-950 text-white space-y-2">
         <div className="flex justify-between items-center text-xs">
           <span className="font-bold text-slate-400 tracking-widest text-[9px] uppercase">AI Model</span>
@@ -134,7 +129,6 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
         </div>
       </div>
 
-      {/* Frame Refresh Rate Selector */}
       {onChangeScanInterval && (
         <div className="space-y-2 pt-1">
           <div className="flex justify-between items-center text-xs font-bold text-on-surface-variant">
@@ -154,9 +148,8 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
         </div>
       )}
 
-      {/* Threshold & Auto-Scan Controls */}
       <div className="space-y-4 pt-2">
-        {/* Confidence Threshold Slider */}
+
         <div className="space-y-1">
           <div className="flex justify-between items-center text-xs font-bold text-on-surface-variant">
             <span>Confidence Threshold</span>
@@ -174,9 +167,8 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
           />
         </div>
 
-        {/* Scan Action Buttons */}
         <div className="flex items-center justify-between gap-4 pt-2">
-          {/* Auto-Scan Toggle */}
+
           <label className={`flex items-center gap-3 cursor-pointer ${isCooldown ? 'opacity-50 pointer-events-none' : ''}`}>
             <input
               type="checkbox"
@@ -189,7 +181,6 @@ export const AIRecognitionPanel: React.FC<AIRecognitionPanelProps> = ({
             <span className="text-xs font-bold text-on-surface">Auto-Scan ({scanIntervalMs / 1000}s)</span>
           </label>
 
-          {/* Manual Trigger */}
           <button
             onClick={onTriggerScan}
             disabled={isAnalyzing || isCooldown}

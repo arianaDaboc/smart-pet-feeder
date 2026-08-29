@@ -2,18 +2,11 @@
 #include <WiFi.h>
 #include <esp_http_server.h>
 
-// Helper macro for safe min calculation
 #define MIN_VAL(a, b) ((a) < (b) ? (a) : (b))
 
-// ============================================================
-// WI-FI CONFIGURATION
-// ============================================================
 const char* ssid     = "YOUR_WIFI_SSID";
 const char* password = "YOUR_WIFI_PASSWORD";
 
-// ============================================================
-// CAMERA PINOUT (AI-THINKER ESP32-CAM MODULE)
-// ============================================================
 #define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
 #define XCLK_GPIO_NUM      0
@@ -43,9 +36,6 @@ static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" 
 static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
 static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
 
-// ============================================================
-// HANDLER: GET /capture (Single JPEG frame snapshot)
-// ============================================================
 static esp_err_t capture_handler(httpd_req_t *req) {
   camera_fb_t * fb = NULL;
   esp_err_t res = ESP_OK;
@@ -66,9 +56,6 @@ static esp_err_t capture_handler(httpd_req_t *req) {
   return res;
 }
 
-// ============================================================
-// HANDLER: GET /stream (Live MJPEG video stream)
-// ============================================================
 static esp_err_t stream_handler(httpd_req_t *req) {
   camera_fb_t * fb = NULL;
   esp_err_t res = ESP_OK;
@@ -99,14 +86,11 @@ static esp_err_t stream_handler(httpd_req_t *req) {
     if (res != ESP_OK) {
       break;
     }
-    vTaskDelay(30 / portTICK_PERIOD_MS); // ~30 FPS frame pacing
+    vTaskDelay(30 / portTICK_PERIOD_MS);
   }
   return res;
 }
 
-// ============================================================
-// HANDLER: GET/POST /feed (blocked: AI authorization must use /result)
-// ============================================================
 static esp_err_t feed_handler(httpd_req_t *req) {
   httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
   httpd_resp_set_type(req, "application/json");
@@ -115,9 +99,6 @@ static esp_err_t feed_handler(httpd_req_t *req) {
   return ESP_OK;
 }
 
-// ============================================================
-// HANDLER: POST /result (Visual indicator feedback from Guardian AI)
-// ============================================================
 static esp_err_t result_handler(httpd_req_t *req) {
   char buf[200];
   int ret, remaining = req->content_len;
@@ -143,8 +124,9 @@ static esp_err_t result_handler(httpd_req_t *req) {
 
   bool isAuthorized = (content.indexOf("\"autorizat\":true") != -1 || content.indexOf("\"authorized\":true") != -1);
 
+  // This endpoint provides visual feedback only; the ESP8266 controls Arduino commands.
   if (isAuthorized) {
-    // Visual feedback only. NodeMCU is the sole module allowed to command Arduino.
+
     Serial.println("✅ AI RECOGNITION MATCH: AUTHORIZED PET DETECTED!");
     digitalWrite(LED_FLASH_PIN, HIGH);
     delay(150);
@@ -162,9 +144,6 @@ static esp_err_t result_handler(httpd_req_t *req) {
   return ESP_OK;
 }
 
-// ============================================================
-// START CAMERA WEB SERVER (Port 81)
-// ============================================================
 void startCameraServer() {
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
   config.server_port = 81;
@@ -215,9 +194,6 @@ void startCameraServer() {
   }
 }
 
-// ============================================================
-// SETUP & INITIALIZATION
-// ============================================================
 void setup() {
   Serial.begin(115200);
   Serial.setDebugOutput(true);
@@ -226,7 +202,7 @@ void setup() {
   pinMode(LED_FLASH_PIN, OUTPUT);
   pinMode(LED_RED_PIN, OUTPUT);
   digitalWrite(LED_FLASH_PIN, LOW);
-  digitalWrite(LED_RED_PIN, HIGH); // Off
+  digitalWrite(LED_RED_PIN, HIGH);
 
   camera_config_t config;
   config.ledc_channel = LEDC_CHANNEL_0;
@@ -250,9 +226,8 @@ void setup() {
   config.xclk_freq_hz = 20000000;
   config.pixel_format = PIXFORMAT_JPEG;
 
-  // Frame size & quality configuration
   if (psramFound()) {
-    // 640x480 retains more face and coat detail for identity matching.
+
     config.frame_size = FRAMESIZE_VGA;
     config.jpeg_quality = 10;
     config.fb_count = 2;
@@ -262,14 +237,12 @@ void setup() {
     config.fb_count = 1;
   }
 
-  // Camera init
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x\n", err);
     return;
   }
 
-  // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED) {
@@ -285,13 +258,9 @@ void setup() {
   Serial.print(WiFi.localIP());
   Serial.println(":81/capture");
 
-  // Start HTTP Server
   startCameraServer();
 }
 
-// ============================================================
-// MAIN LOOP
-// ============================================================
 void loop() {
   delay(10000);
 }

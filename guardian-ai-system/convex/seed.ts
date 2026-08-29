@@ -5,7 +5,6 @@ export const run = mutation({
   handler: async (ctx) => {
     const ownerId = "user_test";
 
-    // 1. Clear existing data for user_test to start fresh
     const existingPets = await ctx.db
       .query("pets")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
@@ -38,7 +37,6 @@ export const run = mutation({
       await ctx.db.delete(notif._id);
     }
 
-    // 2. Insert mock pets
     const whiskersId = await ctx.db.insert("pets", {
       ownerId,
       name: "Whiskers",
@@ -75,7 +73,6 @@ export const run = mutation({
       weightKg: 28.5
     });
 
-    // 3. Insert mock deviceSettings (or update if exists)
     const existingSettings = await ctx.db
       .query("deviceSettings")
       .withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId))
@@ -103,13 +100,12 @@ export const run = mutation({
       await ctx.db.insert("deviceSettings", settingsData);
     }
 
-    // 4. Insert mock feedHistory
     const feedTimes = [
-      Date.now() - 2 * 60 * 60 * 1000, // 2 hours ago
-      Date.now() - 6 * 60 * 60 * 1000, // 6 hours ago
-      Date.now() - 24 * 60 * 60 * 1000, // 1 day ago
-      Date.now() - 28 * 60 * 60 * 1000, // ~1.2 days ago
-      Date.now() - 48 * 60 * 60 * 1000 // 2 days ago
+      Date.now() - 2 * 60 * 60 * 1000,
+      Date.now() - 6 * 60 * 60 * 1000,
+      Date.now() - 24 * 60 * 60 * 1000,
+      Date.now() - 28 * 60 * 60 * 1000,
+      Date.now() - 48 * 60 * 60 * 1000
     ];
 
     await ctx.db.insert("feedHistory", {
@@ -162,15 +158,14 @@ export const run = mutation({
       amountDispensed: 45,
       feedingMethod: "Automatic",
       triggerSource: "PIR",
-      completed: false, // Failed feeding try
+      completed: false,
       temperature: 22.0,
       humidity: 47.5
     });
 
-    // 5. Insert mock aiRecognition detections
     await ctx.db.insert("aiRecognition", {
       ownerId,
-      timestamp: Date.now() - 15 * 60 * 1000, // 15 mins ago
+      timestamp: Date.now() - 15 * 60 * 1000,
       speciesDetected: "Cat",
       confidence: 0.98,
       authorized: true,
@@ -183,7 +178,7 @@ export const run = mutation({
 
     await ctx.db.insert("aiRecognition", {
       ownerId,
-      timestamp: Date.now() - 4 * 60 * 60 * 1000, // 4 hours ago
+      timestamp: Date.now() - 4 * 60 * 60 * 1000,
       speciesDetected: "Dog",
       confidence: 0.97,
       authorized: true,
@@ -196,7 +191,7 @@ export const run = mutation({
 
     await ctx.db.insert("aiRecognition", {
       ownerId,
-      timestamp: Date.now() - 36 * 60 * 60 * 1000, // 36 hours ago
+      timestamp: Date.now() - 36 * 60 * 60 * 1000,
       speciesDetected: "Raccoon",
       confidence: 0.89,
       authorized: false,
@@ -204,7 +199,6 @@ export const run = mutation({
       notificationSent: true
     });
 
-    // 6. Insert mock notifications
     await ctx.db.insert("notifications", {
       ownerId,
       title: "Authorized Pet Fed",

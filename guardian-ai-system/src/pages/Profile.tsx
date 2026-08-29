@@ -59,7 +59,7 @@ export const Profile: React.FC = () => {
 
   return (
     <section className="p-4 md:p-8 space-y-6 max-w-[800px] w-full min-h-screen">
-      {/* Page Header */}
+
       <div className="flex justify-between items-end">
         <div>
           <h3 className="font-bold text-3xl text-on-surface tracking-tight">User Profile</h3>
@@ -68,17 +68,16 @@ export const Profile: React.FC = () => {
       </div>
 
       <div className="space-y-6 pb-20 md:pb-0">
-        
-        {/* Main Details Card */}
+
         <section className="bg-white rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300">
           <div className="relative h-40 bg-surface-container-highest"></div>
           <div className="px-8 pb-10 -mt-20 relative text-center">
             <div className="inline-block relative">
               <div className="w-40 h-40 rounded-3xl border-4 border-white shadow-xl overflow-hidden bg-surface-container mx-auto flex items-center justify-center">
                 {userImage ? (
-                  <img 
-                    alt="User Profile" 
-                    className="w-full h-full object-cover" 
+                  <img
+                    alt="User Profile"
+                    className="w-full h-full object-cover"
                     src={userImage}
                   />
                 ) : (
@@ -163,7 +162,6 @@ export const Profile: React.FC = () => {
           </div>
         </section>
 
-        {/* Connected Device Status */}
         <section className="bg-white rounded-2xl border border-outline-variant/30 p-6 flex items-center justify-between shadow-sm">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -180,9 +178,8 @@ export const Profile: React.FC = () => {
           </div>
         </section>
 
-        {/* Actions Section */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-stack-gap">
-          {/* Change Password */}
+
           <button
             type="button"
             onClick={() => openUserProfile()}
@@ -200,8 +197,7 @@ export const Profile: React.FC = () => {
             <span className="material-symbols-outlined text-on-surface-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
           </button>
 
-          {/* Logout */}
-          <button 
+          <button
             onClick={handleLogout}
             className="group flex items-center justify-between p-6 bg-white rounded-2xl border border-outline-variant/30 hover:bg-error/5 hover:border-error/30 transition-all duration-200 shadow-sm"
           >

@@ -6,7 +6,7 @@ import { api } from '../../convex/_generated/api';
 interface FeederState {
   settings: FeederSettings;
   aiSettings: AISettings;
-  totalDispensed: number; // calculated mathematically from Convex settings
+  totalDispensed: number;
   isDispensing: boolean;
   updateSettings: (newSettings: Partial<FeederSettings>) => void;
   updateAISettings: (newSettings: Partial<AISettings>) => void;
@@ -61,7 +61,6 @@ export const useFeederStore = create<FeederState>((set) => ({
       const amountToDispense = typeof _amount === 'number' && _amount > 0 ? _amount : 45;
       let authorizationDelivered = false;
 
-      // 1. Direct Web Serial hardware dispatch (Instant response)
       const serialPort = (window as any).__activeSerialPort;
       if (serialPort && serialPort.writable) {
         try {
@@ -76,7 +75,6 @@ export const useFeederStore = create<FeederState>((set) => ({
         }
       }
 
-      // 2. Direct local authorization: browser -> NodeMCU -> Arduino.
       const nodeMcuBaseUrl = (localStorage.getItem('guardian_nodemcu_url') || 'http://192.168.100.50').replace(/\/$/, '');
       if (!authorizationDelivered) {
         try {
@@ -96,7 +94,6 @@ export const useFeederStore = create<FeederState>((set) => ({
         }
       }
 
-      // 3. Local offline tracking fallback
       try {
         const localHistory = JSON.parse(localStorage.getItem('guardian_local_feed_history') || '[]');
         const newEvent = {
@@ -110,7 +107,6 @@ export const useFeederStore = create<FeederState>((set) => ({
         window.dispatchEvent(new Event('storage'));
       } catch (e) {}
 
-      // 4. Background Async Sync to Convex Cloud (Fire-and-Forget, DOES NOT block feeding!)
       const targetOwnerIds = Array.from(new Set([ownerId, "user_test", "demo_owner_id"])).filter(Boolean);
       for (const targetId of targetOwnerIds) {
         if (client) {
@@ -136,7 +132,6 @@ export const useFeederStore = create<FeederState>((set) => ({
         }).catch(() => {});
       }
 
-      // Automatically unstick UI loading state after 3 seconds for instant responsive UI
       setTimeout(() => {
         set({ isDispensing: false });
       }, 3000);
@@ -159,7 +154,6 @@ export const useFeederStore = create<FeederState>((set) => ({
     const isPending = !!convexSettings.pendingFeedRequest;
     const isBusyStatus = convexSettings.deviceStatus === "FEEDING" || convexSettings.deviceStatus === "VERIFYING";
 
-    // Maintain isDispensing only while actively pending or busy
     const newIsDispensing = isPending || isBusyStatus;
 
     return {

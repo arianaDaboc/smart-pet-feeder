@@ -20,7 +20,7 @@ interface AIRecognitionHistoryProps {
 export const AIRecognitionHistory: React.FC<AIRecognitionHistoryProps> = ({ records, onClearHistory }) => {
   const getBadge = (petMatch?: string, authorized?: boolean) => {
     const matchState = petMatch || (authorized ? 'AUTHORIZED' : 'UNAUTHORIZED');
-    
+
     switch (matchState) {
       case 'AUTHORIZED':
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700">AUTHORIZED</span>;

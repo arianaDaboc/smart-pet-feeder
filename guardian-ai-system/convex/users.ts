@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Sync Clerk user to Convex
 export const sync = mutation({
   args: {
     clerkId: v.string(),
@@ -18,7 +17,7 @@ export const sync = mutation({
     const timestamp = Date.now();
 
     if (existing) {
-      // Update
+
       await ctx.db.patch(existing._id, {
         email: args.email,
         fullName: args.fullName,
@@ -28,7 +27,7 @@ export const sync = mutation({
       });
       return existing._id;
     } else {
-      // Create new
+
       const newId = await ctx.db.insert("users", {
         clerkId: args.clerkId,
         email: args.email,
@@ -43,7 +42,6 @@ export const sync = mutation({
   },
 });
 
-// Get user profile details
 export const current = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {

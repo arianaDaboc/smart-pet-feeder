@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-// List AI recognition detections for the owner
 export const list = query({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {
@@ -13,7 +12,6 @@ export const list = query({
   },
 });
 
-// Add an AI recognition detection log
 export const add = mutation({
   args: {
     ownerId: v.string(),
@@ -44,7 +42,6 @@ export const add = mutation({
   },
 });
 
-// Delete detection logs
 export const clear = mutation({
   args: { ownerId: v.string() },
   handler: async (ctx, args) => {

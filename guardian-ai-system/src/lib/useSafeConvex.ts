@@ -1,10 +1,8 @@
 import { useQuery, useMutation } from 'convex/react';
 import type { FunctionArgs, FunctionReference, FunctionReturnType } from 'convex/server';
 
-/**
- * Safe wrapper for Convex queries that catches cloud quota errors or network failures
- * and returns fallback data instead of crashing the React application with a white screen.
- */
+
+
 export function useSafeQuery<Query extends FunctionReference<'query'>, Fallback>(
   queryFn: Query,
   args: FunctionArgs<Query>,
@@ -19,9 +17,8 @@ export function useSafeQuery<Query extends FunctionReference<'query'>, Fallback>
   }
 }
 
-/**
- * Safe wrapper for Convex mutations that gracefully handles execution failures.
- */
+
+
 type SafeMutation<Mutation extends FunctionReference<'mutation'>> =
   keyof FunctionArgs<Mutation> extends never
     ? () => Promise<FunctionReturnType<Mutation> | null>
