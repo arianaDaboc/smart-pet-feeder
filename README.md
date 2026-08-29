@@ -9,11 +9,17 @@ Automatic feeding requires two independent conditions:
 
 The owner can also dispense the configured portion manually from the application or with the physical button. Arduino enforces portion timing, the adjustable cooldown and the final servo state regardless of the command source.
 
+## Video demonstration
+
+[![Watch the Guardian AI Smart Pet Feeder demo](assets/video-preview.svg)](https://github.com/arianaDaboc/smart-pet-feeder/releases/download/demo-v1/guardian_ai_video_full.mp4)
+
+Click the preview above to watch the complete **7:44 Guardian AI demonstration**.
+
 ## Project files
 
 - [`guardian-ai-system/`](guardian-ai-system/) — React application, Convex backend, local Next.js AI server and firmware;
 - [`documentation/Guardian-AI-Project-Documentation-EN.pdf`](documentation/Guardian-AI-Project-Documentation-EN.pdf) — final seven-page English technical documentation;
-- [Watch the Guardian AI demonstration](https://arianadaboc.github.io/smart-pet-feeder/demo.html) — project demonstration video;
+- [Full Guardian AI demonstration video](https://github.com/arianaDaboc/smart-pet-feeder/releases/download/demo-v1/guardian_ai_video_full.mp4) — complete 7:44 product demo;
 - the original prototype materials are archived separately in a private repository.
 
 ## Main components
