@@ -26,23 +26,9 @@ The owner can also dispense the configured portion manually from the application
 - React, TypeScript, Vite, Convex and Clerk;
 - local Next.js server using CLIP embeddings through Transformers.js.
 
-## Quick start
+## Integrated product
 
-```powershell
-cd guardian-ai-system
-npm install
-npm run dev
-```
-
-Start the local recognition server in a second terminal:
-
-```powershell
-cd guardian-ai-system/local-ai-server
-npm install
-npm run dev
-```
-
-Copy `.env.example` to `.env.local` and add your own Clerk and Convex configuration. Before uploading the firmware, replace the Wi-Fi, Convex deployment and Clerk user placeholders with your own values.
+Guardian AI is a single smart pet-feeding product. Its web interface, local AI recognition, cloud synchronization and embedded controllers work together as one system to identify the pet, confirm its presence and dispense food safely.
 
 ## Safety principle
 
