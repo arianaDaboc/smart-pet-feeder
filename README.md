@@ -58,6 +58,3 @@ Guardian AI is a single smart pet-feeding product. Its web interface, local AI r
 
 The ESP32-CAM provides the live image, while the local recognition service compares the current frame with the saved pet references. A successful match creates a short authorization window. Arduino then requires a new PIR detection, opens the dispenser for the calculated portion duration, closes the servo and starts the configured cooldown. The ESP8266 bridge keeps the application synchronized with the physical feeder and queues telemetry when the network is unavailable.
 
-## Safety principle
-
-AI errors, missing camera frames, recognition timeouts, missing PIR confirmation and an active cooldown always block automatic feeding. The ESP32-CAM cannot directly command the servo.
