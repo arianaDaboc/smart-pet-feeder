@@ -61,7 +61,3 @@ The ESP32-CAM provides the live image, while the local recognition service compa
 ## Safety principle
 
 AI errors, missing camera frames, recognition timeouts, missing PIR confirmation and an active cooldown always block automatic feeding. The ESP32-CAM cannot directly command the servo.
-
----
-
-**Author:** Daboc Ariana Daria
