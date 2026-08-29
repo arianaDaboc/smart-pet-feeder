@@ -31,9 +31,34 @@ Click the preview above to watch the complete **7:44 Guardian AI demonstration**
 - React, TypeScript, Vite, Convex and Clerk;
 - local Next.js server using CLIP embeddings through Transformers.js.
 
-## Integrated product
+## Key features
+
+- local visual identity matching against photos of registered pets;
+- two-step automatic feeding based on AI authorization followed by fresh PIR motion;
+- live ESP32-CAM monitoring and recognition status in the web application;
+- support for multiple registered pets and reference-photo management;
+- configurable food portions, cooldown duration and temperature limits;
+- manual feeding from the application or directly from the physical button;
+- real-time device status, temperature, humidity and food-level telemetry;
+- feeding history, recognition events, notifications and CSV export;
+- health insights based on feeding activity and consumption trends;
+- guided dispenser calibration with the resulting flow rate stored in EEPROM;
+- automatic Wi-Fi reconnection and a local queue for events created while offline;
+- audible, visual and LCD feedback for feeding, cooldown and error states.
+
+## Feeding modes
+
+| Mode | Trigger | Safety behavior |
+| --- | --- | --- |
+| Smart automatic | Registered pet recognized by AI | Arduino waits for new PIR motion before dispensing |
+| Manual application | Owner presses **Feed Now** | Arduino applies the configured portion and cooldown |
+| Physical control | Owner presses the feeder button | Works locally while preserving portion and cooldown rules |
+
+## How the product works
 
 Guardian AI is a single smart pet-feeding product. Its web interface, local AI recognition, cloud synchronization and embedded controllers work together as one system to identify the pet, confirm its presence and dispense food safely.
+
+The ESP32-CAM provides the live image, while the local recognition service compares the current frame with the saved pet references. A successful match creates a short authorization window. Arduino then requires a new PIR detection, opens the dispenser for the calculated portion duration, closes the servo and starts the configured cooldown. The ESP8266 bridge keeps the application synchronized with the physical feeder and queues telemetry when the network is unavailable.
 
 ## Safety principle
 
