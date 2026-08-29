@@ -11,9 +11,7 @@ The owner can also dispense the configured portion manually from the application
 
 ## Video demonstration
 
-[![Watch the Guardian AI Smart Pet Feeder demo](assets/video-preview.svg)](https://arianadaboc.github.io/smart-pet-feeder/demo.html)
-
-Click the preview above to watch the complete **7:44 Guardian AI demonstration**.
+[Watch the Guardian AI Smart Pet Feeder demonstration](https://arianadaboc.github.io/smart-pet-feeder/demo.html)
 
 ## Project files
 
