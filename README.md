@@ -11,7 +11,7 @@ The owner can also dispense the configured portion manually from the application
 
 ## Video demonstration
 
-[![Watch the Guardian AI Smart Pet Feeder demo](assets/video-preview.svg)](https://github.com/arianaDaboc/smart-pet-feeder/releases/download/demo-v1/guardian_ai_video_full.mp4)
+[![Watch the Guardian AI Smart Pet Feeder demo](assets/video-preview.svg)](https://arianadaboc.github.io/smart-pet-feeder/demo.html)
 
 Click the preview above to watch the complete **7:44 Guardian AI demonstration**.
 
@@ -19,7 +19,7 @@ Click the preview above to watch the complete **7:44 Guardian AI demonstration**
 
 - [`guardian-ai-system/`](guardian-ai-system/) — React application, Convex backend, local Next.js AI server and firmware;
 - [`documentation/Guardian-AI-Project-Documentation-EN.pdf`](documentation/Guardian-AI-Project-Documentation-EN.pdf) — final seven-page English technical documentation;
-- [Full Guardian AI demonstration video](https://github.com/arianaDaboc/smart-pet-feeder/releases/download/demo-v1/guardian_ai_video_full.mp4) — complete 7:44 product demo;
+- [Watch the Guardian AI demonstration](https://arianadaboc.github.io/smart-pet-feeder/demo.html) — complete 7:44 product demo;
 - the original prototype materials are archived separately in a private repository.
 
 ## Main components
