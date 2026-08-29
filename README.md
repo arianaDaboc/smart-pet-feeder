@@ -13,7 +13,7 @@ The owner can also dispense the configured portion manually from the application
 
 - [`guardian-ai-system/`](guardian-ai-system/) — React application, Convex backend, local Next.js AI server and firmware;
 - [`documentation/Guardian-AI-Project-Documentation-EN.pdf`](documentation/Guardian-AI-Project-Documentation-EN.pdf) — final seven-page English technical documentation;
-- [`video/guardian_ai_video.mp4`](video/guardian_ai_video.mp4) — project demonstration video;
+- [Watch the Guardian AI demonstration](https://arianadaboc.github.io/smart-pet-feeder/demo.html) — project demonstration video;
 - the original prototype materials are archived separately in a private repository.
 
 ## Main components
